@@ -23,8 +23,8 @@ function setup() {
 }
 
 function draw() {
-  scale(-1, 0);
-  image(video, 0, 0, -width, height);
+  // scale(-1, 0);
+  image(video, 0, 0, width, height);
 
   // Draw all the tracked face points
   for (let i = 0; i < faces.length; i++) {
