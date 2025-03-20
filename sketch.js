@@ -10,7 +10,7 @@ function preload() {
   faceMesh = ml5.faceMesh(options);
 }
 
-function setup() {
+function setup() {  
   const height = windowHeight;
   const width = height * (16/9);
   createCanvas(width, height);
@@ -23,24 +23,29 @@ function setup() {
 }
 
 function draw() {
-  // scale(-1, 0);
-  image(video, 0, 0, width, height);
+  const height = windowHeight;
+  const width = height * (16/9);
+  const heigthRatio = height / 480;
+  const widthRatio = width / 640;
+
+  push();
+  scale(-1, 1);
+  image(video, 0, 0, -width, height);
+  pop();
 
   // Draw all the tracked face points
-  for (let i = 0; i < faces.length; i++) {
-    let face = faces[i];
-
-    for (let j = 0; j < face.keypoints.length; j++) {
-      let keypoint = face.keypoints[j];
+    for (let face of faces) {
       fill(0, 255, 0);
       noStroke();
-      circle(keypoint.x, keypoint.y, 5);
+
+      circle(face.leftIris.centerX * widthRatio, face.leftIris.centerY * heigthRatio, 15);
+      circle(face.rightIris.centerX * widthRatio, face.rightIris.centerY * heigthRatio, 15);
     }
-  }
 }
 
 // Callback function for when faceMesh outputs data
 function gotFaces(results) {
   // Save the output to the faces variable
   faces = results;
+  console.log(faces);
 }
