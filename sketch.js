@@ -1,13 +1,32 @@
 "use strict";
 
+// Class représentant les découpes de papiers pour les images
+class paperCut {
+  constructor(vertexNb) {
+    this.vertex = vertexNb;
+  }
+}
+  //Options de ces découpes
+let paperCutOptions = {
+  maxVertex: 8
+}
+
+// Définition des variables nécessaires à la détection de visage
 let faceMesh;
 let options = { maxFaces: 1, refineLandmarks: true, flipped: true, runtime: "mediapipe"};
 let faces = [];
 
 let video;
 
+// Définition d'une image pour l'oeil droit
+let img;
+
 function preload() {
+  //Prelaod du modèle de détection de visage
   faceMesh = ml5.faceMesh(options);
+  
+  //Preload de l'image pour l'oeil droit
+  img = loadImage("assets/images/VanGogh-Eye.jpg");
 }
 
 function setup() {  
@@ -20,6 +39,9 @@ function setup() {
   video.hide();
 
   faceMesh.detectStart(video, gotFaces);
+
+  frameRate(10);
+  noStroke();
 }
 
 function draw() {
@@ -28,18 +50,41 @@ function draw() {
   const heigthRatio = height / 480;
   const widthRatio = width / 640;
 
-  push();
-  scale(-1, 1);
-  image(video, 0, 0, -width, height);
-  pop();
+  background(255);
 
-  // Draw all the tracked face points
+
+
+    // Dessiner des points verts sur l'iris
     for (let face of faces) {
-      fill(0, 255, 0);
-      noStroke();
+      let eyeCenterR = createVector(face.leftEye.centerX * widthRatio, face.leftEye.centerY * heigthRatio);
+      let eyeCenterL = createVector(face.rightEye.centerX * widthRatio, face.rightEye.centerY * heigthRatio);
+      let irisCenterR = createVector(face.leftIris.centerX * widthRatio, face.leftIris.centerY * heigthRatio);
+      let irisCenterL = createVector(face.rightIris.centerX * widthRatio, face.rightIris.centerY * heigthRatio);
 
-      circle(face.leftIris.centerX * widthRatio, face.leftIris.centerY * heigthRatio, 15);
-      circle(face.rightIris.centerX * widthRatio, face.rightIris.centerY * heigthRatio, 15);
+      // Oeil droit
+      push();
+        beginClip();
+          beginShape();
+            XXXX
+          endShape(CLOSE);
+        endClip();
+
+        // scale(0.1, 0.1);
+        image();
+      pop();
+
+      // Oeil gauche
+        fill(255, 0, 0);
+        beginShape();
+          vertex(eyeCenterL.x - 50, eyeCenterL.y);
+          bezierVertex(eyeCenterL.x - 25, eyeCenterL.y - 25, eyeCenterL.x + 25, eyeCenterL.y - 25, eyeCenterL.x + 50, eyeCenterL.y);
+          bezierVertex(eyeCenterL.x + 25, eyeCenterL.y + 25, eyeCenterL.x - 25, eyeCenterL.y + 25, eyeCenterL.x - 50, eyeCenterL.y);
+        endShape(CLOSE);
+        fill(0, 255, 0);
+        circle(irisCenterL.x, irisCenterL.y, 25);
+
+      // circle(irisCenterR.x, irisCenterR.y, 15);
+      // circle(irisCenterL.x, irisCenterL.y, 15);
     }
 }
 
