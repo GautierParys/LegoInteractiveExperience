@@ -26,7 +26,7 @@ function preload() {
   faceMesh = ml5.faceMesh(options);
   
   //Preload de l'image pour l'oeil droit
-  img = loadImage("assets/images/VanGogh-Eye.jpg");
+  img = loadImage("assets/images/VanGogh.jpg");
 }
 
 function setup() {  
@@ -61,27 +61,38 @@ function draw() {
       let irisCenterR = createVector(face.leftIris.centerX * widthRatio, face.leftIris.centerY * heigthRatio);
       let irisCenterL = createVector(face.rightIris.centerX * widthRatio, face.rightIris.centerY * heigthRatio);
 
+      let leftIrisXMult = (face.rightEye.centerX - face.rightIris.centerX) * 0.1;
+
       // Oeil droit
       push();
         beginClip();
           beginShape();
-            XXXX
+            vertex(165 + random(5, 21), 140 + random(5, 21));
+            vertex(120 + random(5, 21), 192 + random(5, 21));
+            vertex(157 + random(5, 21), 261 + random(5, 21));
+            vertex(258 + random(5, 21), 241 + random(5, 21));
+            vertex(334 + random(5, 21), 257 + random(5, 21));
+            vertex(431 + random(5, 21), 239 + random(5, 21));
+            vertex(469 + random(5, 21), 181 + random(5, 21));
+            vertex(442 + random(5, 21), 98 + random(5, 21));
+            vertex(350 + random(5, 21), 58 + random(5, 21));
+            vertex(267 + random(5, 21), 54 + random(5, 21));
+            vertex(239 + random(5, 21), 108 + random(5, 21));
           endShape(CLOSE);
         endClip();
 
-        // scale(0.1, 0.1);
-        image();
+        image(img, 95 + random(0, 5), 29 + random(0, 5), 349, );
       pop();
 
       // Oeil gauche
         fill(255, 0, 0);
         beginShape();
-          vertex(eyeCenterL.x - 50, eyeCenterL.y);
-          bezierVertex(eyeCenterL.x - 25, eyeCenterL.y - 25, eyeCenterL.x + 25, eyeCenterL.y - 25, eyeCenterL.x + 50, eyeCenterL.y);
-          bezierVertex(eyeCenterL.x + 25, eyeCenterL.y + 25, eyeCenterL.x - 25, eyeCenterL.y + 25, eyeCenterL.x - 50, eyeCenterL.y);
+          vertex(300- 50, 300);
+          bezierVertex(300 - 25, 300 - 25, 300 + 25, 300 - 25, 300 + 50, 300);
+          bezierVertex(300 + 25, 300 + 25, 300 - 25, 300 + 25, 300 - 50, 300);
         endShape(CLOSE);
         fill(0, 255, 0);
-        circle(irisCenterL.x, irisCenterL.y, 25);
+        circle(300 - (25 * leftIrisXMult), 300, 25);
 
       // circle(irisCenterR.x, irisCenterR.y, 15);
       // circle(irisCenterL.x, irisCenterL.y, 15);
