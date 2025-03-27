@@ -21,18 +21,38 @@ let video;
 // Définition d'une image pour l'oeil droit
 let img;
 
+// Définition des noms des fonts
+let panchang_regular;
+let panchang_semibold;
+let panchang_extrabold;
+
 function preload() {
   //Prelaod du modèle de détection de visage
   faceMesh = ml5.faceMesh(options);
   
   //Preload de l'image pour l'oeil droit
   img = loadImage("assets/images/VanGogh.jpg");
+
+  //Preload de la font Panchang
+  panchang_extrabold = loadFont("assets/fonts/Panchang-Extrabold.woff",
+    () => console.log("Panchang extrabold loaded"),
+    () => console.error("Panchang extrabold not loaded")
+  );
+  panchang_semibold = loadFont("assets/fonts/Panchang-Semibold.woff",
+    () => console.log("Panchang semibold loaded"),
+    () => console.error("Panchang semibold not loaded")
+  );
+  panchang_regular =loadFont("assets/fonts/Panchang-Regular.woff",
+    () => console.log("Panchang regular loaded"),
+    () => console.error("Panchang regular not loaded")
+  );
+
 }
 
 function setup() {  
   const height = windowHeight;
   const width = height * (16/9);
-  createCanvas(width, height);
+  createCanvas(windowWidth, height);
 
   video = createCapture(VIDEO);
   video.size(width, height);
@@ -50,52 +70,56 @@ function draw() {
   const heigthRatio = height / 480;
   const widthRatio = width / 640;
 
-  background(255);
+  background(200);
 
+  textFont(panchang_extrabold);
+  fill(0);
+  textSize(80);
+  text("LEGO .1", 30, 90);
+
+  fill(130);
+  square(width / 2 - 150, height / 2 - 300, 600);
 
 
     // Dessiner des points verts sur l'iris
     for (let face of faces) {
-      let eyeCenterR = createVector(face.leftEye.centerX * widthRatio, face.leftEye.centerY * heigthRatio);
-      let eyeCenterL = createVector(face.rightEye.centerX * widthRatio, face.rightEye.centerY * heigthRatio);
-      let irisCenterR = createVector(face.leftIris.centerX * widthRatio, face.leftIris.centerY * heigthRatio);
-      let irisCenterL = createVector(face.rightIris.centerX * widthRatio, face.rightIris.centerY * heigthRatio);
-
-      let leftIrisXMult = (face.rightEye.centerX - face.rightIris.centerX) * 0.1;
 
       // Oeil droit
       push();
+        translate(900, 225);
+        scale(0.5);
         beginClip();
           beginShape();
-            vertex(165 + random(5, 21), 140 + random(5, 21));
-            vertex(120 + random(5, 21), 192 + random(5, 21));
-            vertex(157 + random(5, 21), 261 + random(5, 21));
-            vertex(258 + random(5, 21), 241 + random(5, 21));
-            vertex(334 + random(5, 21), 257 + random(5, 21));
-            vertex(431 + random(5, 21), 239 + random(5, 21));
-            vertex(469 + random(5, 21), 181 + random(5, 21));
-            vertex(442 + random(5, 21), 98 + random(5, 21));
-            vertex(350 + random(5, 21), 58 + random(5, 21));
-            vertex(267 + random(5, 21), 54 + random(5, 21));
-            vertex(239 + random(5, 21), 108 + random(5, 21));
+            vertex(45 + random(5, 21), 86 + random(5, 21));
+            vertex(0 + random(5, 21), 138 + random(5, 21));
+            vertex(37 + random(5, 21), 207 + random(5, 21));
+            vertex(138 + random(5, 21), 187 + random(5, 21));
+            vertex(214 + random(5, 21), 203 + random(5, 21));
+            vertex(311 + random(5, 21), 185 + random(5, 21));
+            vertex(349 + random(5, 21), 127 + random(5, 21));
+            vertex(322 + random(5, 21), 44 + random(5, 21));
+            vertex(230 + random(5, 21), 4 + random(5, 21));
+            vertex(147 + random(5, 21), 0 + random(5, 21));
+            vertex(119 + random(5, 21), 54 + random(5, 21));          
           endShape(CLOSE);
         endClip();
 
-        image(img, 95 + random(0, 5), 29 + random(0, 5), 349, );
+        image(img, 0, 0);
       pop();
 
       // Oeil gauche
-        fill(255, 0, 0);
-        beginShape();
-          vertex(300- 50, 300);
-          bezierVertex(300 - 25, 300 - 25, 300 + 25, 300 - 25, 300 + 50, 300);
-          bezierVertex(300 + 25, 300 + 25, 300 - 25, 300 + 25, 300 - 50, 300);
-        endShape(CLOSE);
-        fill(0, 255, 0);
-        circle(300 - (25 * leftIrisXMult), 300, 25);
-
-      // circle(irisCenterR.x, irisCenterR.y, 15);
-      // circle(irisCenterL.x, irisCenterL.y, 15);
+      push();
+      fill("#FFD0AB");
+      translate(625, 250);
+      scale(0.5);
+      beginShape();
+        vertex(164.5,0);
+        bezierVertex(94.6076,0,0,70.5,0,70.5);
+        bezierVertex(0,70.5,94.6076,141,164.5,141);
+        bezierVertex(234.392,141,329,70.5,329,70.5);
+        bezierVertex(329,70.5,234.392,0,164.5,0);
+      endShape(CLOSE);
+      pop();
     }
 }
 
