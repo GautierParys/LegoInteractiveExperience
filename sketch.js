@@ -62,23 +62,27 @@ function setup() {
 
   frameRate(10);
   noStroke();
+
+  rectMode(CENTER);
 }
 
 function draw() {
   const height = windowHeight;
-  const width = height * (16/9);
-  const heigthRatio = height / 480;
-  const widthRatio = width / 640;
+  const width = windowWidth;
 
-  background(200);
+  background(255);
 
   textFont(panchang_extrabold);
   fill(0);
   textSize(80);
-  text("LEGO .1", 30, 90);
+  let txt = "LEGO .1";
+  let textWid = textWidth("LEGO .1");
+  text(txt, 30, 90);
+  
+  console.log(textWid);
 
   fill(130);
-  square(width / 2 - 150, height / 2 - 300, 600);
+  square(width / 2, height / 2, 800);
 
 
     // Dessiner des points verts sur l'iris
