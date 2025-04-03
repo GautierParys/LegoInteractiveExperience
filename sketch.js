@@ -78,8 +78,6 @@ function draw() {
   let txt = "LEGO .1";
   let textWid = textWidth("LEGO .1");
   text(txt, 30, 90);
-  
-  console.log(textWid);
 
   fill(130);
   square(width / 2, height / 2, 800);
@@ -87,10 +85,10 @@ function draw() {
 
     // Dessiner des points verts sur l'iris
     for (let face of faces) {
-      const leftIrisMult = -(face.leftEye.centerX - face.leftIris.centerX);
-      const currentX = 164.5;
-      const targetX = currentX + 1000 * leftIrisMult;
-      const lerpX = lerp(currentX, targetX, 0.01);
+      const leftIrisMult = dist(face.leftEye.centerX, face.leftIris.centerX);
+      // const currentX = 164.5;
+      // const targetX = currentX + 1000 * leftIrisMult;
+      // const lerpX = lerp(currentX, targetX, 0.01);
 
       // Oeil droit
       push();
@@ -127,11 +125,19 @@ function draw() {
         bezierVertex(234.392,141,329,70.5,329,70.5);
         bezierVertex(329,70.5,234.392,0,164.5,0);
       endShape(CLOSE);
-      fill("#2079B8");
-      circle(constrain(lerpX, 125, 204), 70.5, 125);
-      fill("#080808");
-      
-      circle(constrain(lerpX, 105, 224), 70.5, 65);
+
+      if (leftIrisMult < 0) {
+        fill("#2079B8");
+        circle(lerp(164.5, 125, 0.05), 70.5, 125);
+        fill("#080808");
+        circle(lerp(164.5, 105, 0.05), 70.5, 65);
+      } else if (164.5 > 0) {
+        fill("#2079B8");
+        circle(lerp(164.5, 204, 0.05), 70.5, 125);
+        fill("#080808");
+        circle(lerp(164.5, 224, 0.05), 70.5, 65);
+      }
+
       pop();
     }
 }
