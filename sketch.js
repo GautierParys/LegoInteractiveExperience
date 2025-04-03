@@ -85,7 +85,8 @@ function draw() {
 
     // Dessiner des points verts sur l'iris
     for (let face of faces) {
-      const leftIrisMult = dist(face.leftEye.centerX, face.leftIris.centerX);
+      // const leftIrisMult = dist(face.leftEye.centerX, 0, face.leftIris.centerX, 0);
+      // console.log(leftIrisMult);
       // const currentX = 164.5;
       // const targetX = currentX + 1000 * leftIrisMult;
       // const lerpX = lerp(currentX, targetX, 0.01);
@@ -126,17 +127,41 @@ function draw() {
         bezierVertex(329,70.5,234.392,0,164.5,0);
       endShape(CLOSE);
 
-      if (leftIrisMult < 0) {
-        fill("#2079B8");
-        circle(lerp(164.5, 125, 0.05), 70.5, 125);
-        fill("#080808");
-        circle(lerp(164.5, 105, 0.05), 70.5, 65);
-      } else if (164.5 > 0) {
-        fill("#2079B8");
-        circle(lerp(164.5, 204, 0.05), 70.5, 125);
-        fill("#080808");
-        circle(lerp(164.5, 224, 0.05), 70.5, 65);
+      const leftEyeMult = constrain(round(face.leftEye.centerX - face.leftIris.centerX), -3, 3);
+      const leftEyeX = leftEyeMult < -1 ? 190 : leftEyeMult > .25 ? 140 : null;
+      const currentX = leftEyeMult;
+      console.log(leftEyeMult);
+      console.log(leftEyeX);
+      fill("#2079B8");
+      switch (leftEyeX) {
+        case 140:
+          circle(140, 70.5, 125);
+        break;
+        case 190:
+          circle(190, 70.5, 125);
+        break;
+        default:
+          circle(164.5, 70.5, 125);
       }
+      // switch (leftEyeMult) {
+      //   case .5:
+      //     circle(140, 70.5, 125);
+      //   break;
+
+      //   case -.5:
+      //     circle(190, 70.5, 125);
+      //   break;
+
+      //   default:
+      //     circle(164.5, 70.5, 125);
+      // }
+
+      // if (leftIrisMult > 0) {
+      //   fill("#2079B8");
+      //   circle(lerp(164.5, 125, 0.05), 70.5, 125);
+      //   fill("#080808");
+      //   circle(lerp(164.5, 105, 0.05), 70.5, 65);
+      // }
 
       pop();
     }
