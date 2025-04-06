@@ -76,14 +76,13 @@ function draw() {
   fill(0);
   textSize(80);
   let txt = "LEGO .1";
-  let textWid = textWidth("LEGO .1");
+  // let textWid = textWidth(txt);
   text(txt, 30, 90);
 
   fill(130);
   square(width / 2, height / 2, 800);
 
 
-    // Dessiner des points verts sur l'iris
     for (let face of faces) {
       // const leftIrisMult = dist(face.leftEye.centerX, 0, face.leftIris.centerX, 0);
       // console.log(leftIrisMult);
