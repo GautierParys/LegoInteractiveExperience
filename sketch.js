@@ -1,16 +1,5 @@
 "use strict";
 
-// Class représentant les découpes de papiers pour les images
-class paperCut {
-  constructor(vertexNb) {
-    this.vertex = vertexNb;
-  }
-}
-  //Options de ces découpes
-let paperCutOptions = {
-  maxVertex: 8
-}
-
 // Définition des variables nécessaires à la détection de visage
 let faceMesh;
 let options = { maxFaces: 1, refineLandmarks: true, flipped: true, runtime: "mediapipe"};
@@ -25,6 +14,9 @@ let img;
 let panchang_regular;
 let panchang_semibold;
 let panchang_extrabold;
+
+// Scale
+let scaleMult = 0.75;
 
 function preload() {
   //Prelaod du modèle de détection de visage
@@ -80,33 +72,30 @@ function draw() {
   text(txt, 30, 90);
 
   fill(130);
-  square(width / 2, height / 2, 800);
+  square(width / 2, height / 2, 1080 * scaleMult);
 
 
     for (let face of faces) {
-      // const leftIrisMult = dist(face.leftEye.centerX, 0, face.leftIris.centerX, 0);
-      // console.log(leftIrisMult);
-      // const currentX = 164.5;
-      // const targetX = currentX + 1000 * leftIrisMult;
-      // const lerpX = lerp(currentX, targetX, 0.01);
-
       // Oeil droit
       push();
-        translate(900, 225);
-        scale(0.5);
+        translate(width / 2 + 75, 225);
+        scale(0.75);
         beginClip();
           beginShape();
-            vertex(45 + random(5, 21), 86 + random(5, 21));
-            vertex(0 + random(5, 21), 138 + random(5, 21));
-            vertex(37 + random(5, 21), 207 + random(5, 21));
-            vertex(138 + random(5, 21), 187 + random(5, 21));
-            vertex(214 + random(5, 21), 203 + random(5, 21));
-            vertex(311 + random(5, 21), 185 + random(5, 21));
-            vertex(349 + random(5, 21), 127 + random(5, 21));
-            vertex(322 + random(5, 21), 44 + random(5, 21));
-            vertex(230 + random(5, 21), 4 + random(5, 21));
-            vertex(147 + random(5, 21), 0 + random(5, 21));
-            vertex(119 + random(5, 21), 54 + random(5, 21));          
+            vertex(26 + random(5, 21),37 + random(5, 21));
+            vertex(73 + random(5, 21),28 + random(5, 21));
+            vertex(114 + random(5, 21),0 + random(5, 21));
+            vertex(189 + random(5, 21),13 + random(5, 21));
+            vertex(223 + random(5, 21),42 + random(5, 21));
+            vertex(262 + random(5, 21),67 + random(5, 21));
+            vertex(283 + random(5, 21),135 + random(5, 21));
+            vertex(243 + random(5, 21),157 + random(5, 21));
+            vertex(183 + random(5, 21),171 + random(5, 21));
+            vertex(120 + random(5, 21),148 + random(5, 21));
+            vertex(44 + random(5, 21),161 + random(5, 21));
+            vertex(2 + random(5, 21),125 + random(5, 21));
+            vertex(0 + random(5, 21),82 + random(5, 21));
+            vertex(26 + random(5, 21),37 + random(5, 21));
           endShape(CLOSE);
         endClip();
 
@@ -116,8 +105,9 @@ function draw() {
       // Oeil gauche
       push();
       fill("#FFD0AB");
-      translate(625, 250);
-      scale(0.5);
+      translate(width / 2 - 325, 250);
+      scale(0.75);
+      rotate(25);
       beginShape();
         vertex(164.5,0);
         bezierVertex(94.6076,0,0,70.5,0,70.5);
@@ -128,9 +118,8 @@ function draw() {
 
       const leftEyeMult = constrain(round(face.leftEye.centerX - face.leftIris.centerX), -3, 3);
       const leftEyeX = leftEyeMult < -1 ? 190 : leftEyeMult > .25 ? 140 : null;
-      const currentX = leftEyeMult;
-      console.log(leftEyeMult);
-      console.log(leftEyeX);
+      // console.log(leftEyeMult);
+      // console.log(leftEyeX);
       fill("#2079B8");
       switch (leftEyeX) {
         case 140:
@@ -142,26 +131,35 @@ function draw() {
         default:
           circle(164.5, 70.5, 125);
       }
-      // switch (leftEyeMult) {
-      //   case .5:
-      //     circle(140, 70.5, 125);
-      //   break;
+      pop();
 
-      //   case -.5:
-      //     circle(190, 70.5, 125);
-      //   break;
+      // Bouche
+      push();
+        translate(width / 2 - 203, 500);
+        scale(0.75);
 
-      //   default:
-      //     circle(164.5, 70.5, 125);
-      // }
+        beginClip();
+          beginShape();
+            vertex(30 + random(5, 21),56 + random(5, 21));
+            vertex(50 + random(5, 21),21 + random(5, 21));
+            vertex(141 + random(5, 21),21 + random(5, 21));
+            vertex(203 + random(5, 21),0 + random(5, 21));
+            vertex(311 + random(5, 21),38 + random(5, 21));
+            vertex(407 + random(5, 21),21 + random(5, 21));
+            vertex(506 + random(5, 21),62 + random(5, 21));
+            vertex(466 + random(5, 21),89 + random(5, 21));
+            vertex(466 + random(5, 21),159 + random(5, 21));
+            vertex(432 + random(5, 21),227 + random(5, 21));
+            vertex(335 + random(5, 21),238 + random(5, 21));
+            vertex(250 + random(5, 21),201 + random(5, 21));
+            vertex(203 + random(5, 21),245 + random(5, 21));
+            vertex(95 + random(5, 21),245 + random(5, 21));
+            vertex(0 + random(5, 21),191 + random(5, 21));
+            vertex(30 + random(5, 21),56 + random(5, 21));
+          endShape(CLOSE);
+        endClip();
 
-      // if (leftIrisMult > 0) {
-      //   fill("#2079B8");
-      //   circle(lerp(164.5, 125, 0.05), 70.5, 125);
-      //   fill("#080808");
-      //   circle(lerp(164.5, 105, 0.05), 70.5, 65);
-      // }
-
+        image(img, 0, 0);
       pop();
     }
 }
