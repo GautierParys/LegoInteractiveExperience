@@ -46,13 +46,15 @@ function preload() {
 
 }
 
-function setup() {  
-  const height = windowHeight;
-  const width = height * (16/9);
-  createCanvas(windowWidth, height);
+function setup() {
+  const baseWidth = 1600;
+  const baseHeight = 900;
+  const {canvasWidth, canvasHeight} = canvasUpdate(baseWidth, baseHeight);
+
+  createCanvas(canvasWidth, canvasHeight);
 
   video = createCapture(VIDEO);
-  video.size(width, height);
+  video.size(canvasWidth, canvasHeight);
   video.hide();
 
   faceMesh.detectStart(video, gotFaces);
@@ -69,6 +71,7 @@ function draw() {
 
   background(255);
 
+  scale();
   textFont(panchang_extrabold);
   fill(0);
   textSize(80);
@@ -89,7 +92,6 @@ function draw() {
       // Oeil droit
       push();
         translate(width / 2 - 540 + 679, 198);
-        scale(scaleMult);
         rotate(0.1),
         beginClip();
           beginShape();
@@ -115,7 +117,6 @@ function draw() {
       // Oeil gauche
       push();
       translate(width / 2 - 540 + 161, 265);
-      scale(scaleMult);
       rotate(-0.2);
 
       beginClip();
@@ -156,7 +157,6 @@ function draw() {
       // Bouche
       push();
         translate(width / 2 - 540 + 315, 564);
-        scale(scaleMult);
 
         beginClip();
           beginShape();
@@ -188,4 +188,28 @@ function gotFaces(results) {
   // Save the output to the faces variable
   faces = results;
   console.log(faces);
+}
+
+function canvasUpdate (baseWidth, baseHeight) {
+  const aspectRatio = baseWidth / baseHeight
+  if (windowWidth / windowHeight > aspectRatio) {
+    const canvasWidth = windowHeight * aspectRatio;
+    const canvasHeight = windowHeight;
+    const scaleFactor = canvasWidth / baseWidth;
+    return {
+      canvasWidth: canvasWidth,
+      canvasHeight: canvasHeight,
+      scaleFactor: scaleFactor
+    };
+  }
+
+  return {
+    canvasWidth: baseWidth,
+    canvasHeight: baseHeight,
+    scaleFactor: scaleFactor
+  };
+}
+
+function windowResized () {
+  setup();
 }
