@@ -8,7 +8,9 @@ let faces = [];
 let video;
 
 // Définition d'une image pour l'oeil droit
-let img;
+let rightEye;
+let mouth;
+let backgroundImage;
 
 // Définition des noms des fonts
 let panchang_regular;
@@ -16,14 +18,17 @@ let panchang_semibold;
 let panchang_extrabold;
 
 // Scale
-let scaleMult = 0.75;
+let scaleMult = 1;
 
 function preload() {
   //Prelaod du modèle de détection de visage
   faceMesh = ml5.faceMesh(options);
   
   //Preload de l'image pour l'oeil droit
-  img = loadImage("assets/images/VanGogh.jpg");
+  rightEye = loadImage("assets/images/VanGogh-Eye.jpg");
+
+  // Prelaod de l'image pour le background
+  backgroundImage = loadImage("assets/images/water.jpg");
 
   //Preload de la font Panchang
   panchang_extrabold = loadFont("assets/fonts/Panchang-Extrabold.woff",
@@ -71,15 +76,21 @@ function draw() {
   // let textWid = textWidth(txt);
   text(txt, 30, 90);
 
-  fill(130);
-  square(width / 2, height / 2, 1080 * scaleMult);
+  push();
+    beginClip();
+      square(width / 2, height / 2, 1080 * scaleMult);
+    endClip();
+
+    image(backgroundImage, 0, 0);
+  pop();
 
 
     for (let face of faces) {
       // Oeil droit
       push();
-        translate(width / 2 + 75, 225);
-        scale(0.75);
+        translate(width / 2 - 540 + 679, 198);
+        scale(scaleMult);
+        rotate(0.1),
         beginClip();
           beginShape();
             vertex(26 + random(5, 21),37 + random(5, 21));
@@ -95,26 +106,29 @@ function draw() {
             vertex(44 + random(5, 21),161 + random(5, 21));
             vertex(2 + random(5, 21),125 + random(5, 21));
             vertex(0 + random(5, 21),82 + random(5, 21));
-            vertex(26 + random(5, 21),37 + random(5, 21));
           endShape(CLOSE);
         endClip();
 
-        image(img, 0, 0);
+        image(rightEye, 0, 0);
       pop();
 
       // Oeil gauche
       push();
-      fill("#FFD0AB");
-      translate(width / 2 - 325, 250);
-      scale(0.75);
-      rotate(25);
-      beginShape();
-        vertex(164.5,0);
-        bezierVertex(94.6076,0,0,70.5,0,70.5);
-        bezierVertex(0,70.5,94.6076,141,164.5,141);
-        bezierVertex(234.392,141,329,70.5,329,70.5);
-        bezierVertex(329,70.5,234.392,0,164.5,0);
-      endShape(CLOSE);
+      translate(width / 2 - 540 + 161, 265);
+      scale(scaleMult);
+      rotate(-0.2);
+
+      beginClip();
+        beginShape();
+          vertex(164.5,0);
+          bezierVertex(94.6076,0,0,70.5,0,70.5);
+          bezierVertex(0,70.5,94.6076,141,164.5,141);
+          bezierVertex(234.392,141,329,70.5,329,70.5);
+          bezierVertex(329,70.5,234.392,0,164.5,0);
+        endShape(CLOSE);
+      endClip();
+
+      background("#FFD0AB");
 
       const leftEyeMult = constrain(round(face.leftEye.centerX - face.leftIris.centerX), -3, 3);
       const leftEyeX = leftEyeMult < -1 ? 190 : leftEyeMult > .25 ? 140 : null;
@@ -123,20 +137,26 @@ function draw() {
       fill("#2079B8");
       switch (leftEyeX) {
         case 140:
-          circle(140, 70.5, 125);
+          circle(120, 70.5, 131);
+          fill("#080808");
+          circle(110, 70.5, 58);
         break;
         case 190:
-          circle(190, 70.5, 125);
+          circle(210, 70.5, 131);
+          fill("#080808");
+          circle(220, 70.5, 58);
         break;
         default:
-          circle(164.5, 70.5, 125);
+          circle(164.5, 70.5, 131);
+          fill("#080808");
+          circle(164.5, 70.5, 58);
       }
       pop();
 
       // Bouche
       push();
-        translate(width / 2 - 203, 500);
-        scale(0.75);
+        translate(width / 2 - 540 + 315, 564);
+        scale(scaleMult);
 
         beginClip();
           beginShape();
@@ -155,11 +175,10 @@ function draw() {
             vertex(203 + random(5, 21),245 + random(5, 21));
             vertex(95 + random(5, 21),245 + random(5, 21));
             vertex(0 + random(5, 21),191 + random(5, 21));
-            vertex(30 + random(5, 21),56 + random(5, 21));
           endShape(CLOSE);
         endClip();
 
-        image(img, 0, 0);
+        image(rightEye, 0, 0);
       pop();
     }
 }
