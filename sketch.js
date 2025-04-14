@@ -2,7 +2,7 @@
 
 // Définition des variables nécessaires à la détection de visage
 let faceMesh;
-let options = { maxFaces: 1, refineLandmarks: true, flipped: true, runtime: "mediapipe"};
+const options = {maxFaces: 1, refineLandmarks: true, flipped: true, runtime: "mediapipe"};
 let faces = [];
 
 let video;
@@ -18,7 +18,11 @@ let panchang_semibold;
 let panchang_extrabold;
 
 // Scale
-let scaleMult = 1;
+const scaleMult = 1;
+
+// Taille du canva en fonction de la taille du navigateur
+// const canvasWidth = windowWidth;
+// const canvasHeight = windowHeight;
 
 function preload() {
   //Prelaod du modèle de détection de visage
@@ -47,41 +51,45 @@ function preload() {
 }
 
 function setup() {
-  const baseWidth = 1600;
-  const baseHeight = 900;
-  const {canvasWidth, canvasHeight} = canvasUpdate(baseWidth, baseHeight);
+  // const baseWidth = 1600;
+  // const baseHeight = 900;
+  // const {canvasWidth, canvasHeight} = canvasUpdate(baseWidth, baseHeight);
+
+  const canvasWidth = windowWidth;
+  const canvasHeight = windowHeight;
+
+  const videoWidth = 640;
+  const videoHeight = 480;
 
   createCanvas(canvasWidth, canvasHeight);
 
   video = createCapture(VIDEO);
-  video.size(canvasWidth, canvasHeight);
+  video.size(videoWidth, videoHeight);
   video.hide();
 
   faceMesh.detectStart(video, gotFaces);
 
   frameRate(10);
   noStroke();
-
   rectMode(CENTER);
 }
 
 function draw() {
-  const height = windowHeight;
-  const width = windowWidth;
+  const canvasWidth = windowWidth;
+  const canvasHeight = windowHeight;
 
   background(255);
 
-  scale();
-  textFont(panchang_extrabold);
-  fill(0);
-  textSize(80);
-  let txt = "LEGO .1";
-  // let textWid = textWidth(txt);
-  text(txt, 30, 90);
+  // textFont(panchang_extrabold);
+  // fill(0);
+  // textSize(80);
+  // let txt = "LEGO .1";
+  // // let textWid = textWidth(txt);
+  // text(txt, 30, 90);
 
   push();
     beginClip();
-      square(width / 2, height / 2, 1080 * scaleMult);
+      square(canvasWidth / 2, canvasHeight / 2, 1080 * scaleMult);
     endClip();
 
     image(backgroundImage, 0, 0);
@@ -91,7 +99,7 @@ function draw() {
     for (let face of faces) {
       // Oeil droit
       push();
-        translate(width / 2 - 540 + 679, 198);
+        translate(canvasWidth / 2 - 540 + 679, 198);
         rotate(0.1),
         beginClip();
           beginShape();
@@ -116,7 +124,7 @@ function draw() {
 
       // Oeil gauche
       push();
-      translate(width / 2 - 540 + 161, 265);
+      translate(canvasWidth / 2 - 540 + 161, 265);
       rotate(-0.2);
 
       beginClip();
@@ -156,7 +164,7 @@ function draw() {
 
       // Bouche
       push();
-        translate(width / 2 - 540 + 315, 564);
+        translate(canvasWidth / 2 - 540 + 315, 564);
 
         beginClip();
           beginShape();
@@ -190,26 +198,27 @@ function gotFaces(results) {
   console.log(faces);
 }
 
-function canvasUpdate (baseWidth, baseHeight) {
-  const aspectRatio = baseWidth / baseHeight
-  if (windowWidth / windowHeight > aspectRatio) {
-    const canvasWidth = windowHeight * aspectRatio;
-    const canvasHeight = windowHeight;
-    const scaleFactor = canvasWidth / baseWidth;
-    return {
-      canvasWidth: canvasWidth,
-      canvasHeight: canvasHeight,
-      scaleFactor: scaleFactor
-    };
-  }
+// function canvasUpdate (baseWidth, baseHeight) {
+//   const aspectRatio = baseWidth / baseHeight
+//   if (windowWidth / windowHeight > aspectRatio) {
+//     const canvasWidth = windowHeight * aspectRatio;
+//     const canvasHeight = windowHeight;
+//     const scaleFactor = canvasWidth / baseWidth;
+//     return {
+//       canvasWidth: canvasWidth,
+//       canvasHeight: canvasHeight,
+//       scaleFactor: scaleFactor
+//     };
+//   }
 
-  return {
-    canvasWidth: baseWidth,
-    canvasHeight: baseHeight,
-    scaleFactor: scaleFactor
-  };
-}
+//   return {
+//     canvasWidth: baseWidth,
+//     canvasHeight: baseHeight,
+//     scaleFactor: scaleFactor
+//   };
+// }
 
 function windowResized () {
+  preload();
   setup();
 }
