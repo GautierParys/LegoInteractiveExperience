@@ -7,10 +7,11 @@ let faces = [];
 
 let video;
 
-// Définition d'une image pour l'oeil droit
+// Définition des images
 let rightEye;
 let mouth;
 let backgroundImage;
+let grass;
 
 // Définition des noms des fonts
 let panchang_regular;
@@ -28,11 +29,10 @@ function preload() {
   //Prelaod du modèle de détection de visage
   faceMesh = ml5.faceMesh(options);
   
-  //Preload de l'image pour l'oeil droit
+  //Preload des images
   rightEye = loadImage("assets/images/VanGogh-Eye.jpg");
-
-  // Prelaod de l'image pour le background
   backgroundImage = loadImage("assets/images/water.jpg");
+  grass = loadImage("assets/images/grass.jpg");
 
   //Preload de la font Panchang
   panchang_extrabold = loadFont("assets/fonts/Panchang-Extrabold.woff",
@@ -47,7 +47,6 @@ function preload() {
     () => console.log("Panchang regular loaded"),
     () => console.error("Panchang regular not loaded")
   );
-
 }
 
 function setup() {
@@ -72,6 +71,7 @@ function setup() {
   frameRate(10);
   noStroke();
   rectMode(CENTER);
+  angleMode(DEGREES);
 }
 
 function draw() {
@@ -96,11 +96,84 @@ function draw() {
   pop();
 
 
+  // Parcelles de terre
+  push();
+    translate(canvasWidth / 2 - 540 + 653, 217);
+
+    beginClip();
+      beginShape();
+        vertex(440,0);
+        vertex(169,35.5);
+        vertex(108.5,185);
+        vertex(0,291.5);
+        vertex(41,532);
+        vertex(242,596);
+        vertex(320.5,453.5);
+        vertex(472,316.5);
+        vertex(440,0);
+      endShape();
+    endClip();
+
+    image(grass, 0, 0);
+  pop();
+
+  push();
+    translate(canvasWidth / 2 - 540 - 86, -44);
+
+    beginClip();
+      beginShape();
+        vertex(510.765,287.475);
+        vertex(375.14,217.086);
+        vertex(325.473,81.5841);
+        vertex(239.449,0.636229);
+        vertex(64.6278,26.2642);
+        vertex(13.8614,93.0667);
+        vertex(0.985041,189.016);
+        vertex(14.4599,312.506);
+        vertex(182.697,432.665);
+        vertex(197.176,564.398);
+        vertex(361.887,551.577);
+        vertex(531.14,602.934);
+        vertex(541.05,393.768);
+        vertex(510.765,287.475);
+      endShape();
+    endClip();
+
+    image(grass, 0, 0);
+  pop();
+
+  push();
+    translate(canvasWidth / 2 - 540 + 106, 632);
+
+    beginClip();
+      beginShape();
+        vertex(0,152.774);
+        vertex(13.0914,46.9748);
+        vertex(192.782,0);
+        vertex(300.258,39.3572);
+        vertex(415.335,46.9748);
+        vertex(462,152.774);
+        vertex(372.26,197.844);
+        vertex(378.806,323.322);
+        vertex(451.151,449.011);
+        vertex(344.177,478);
+        vertex(223.741,468.69);
+        vertex(192.782,380.665);
+        vertex(96.2852,328.189);
+        vertex(70.1024,233.393);
+        vertex(0,152.774);
+      endShape();
+    endClip();
+
+    image(grass, 0, 0);
+  pop();
+
+
     for (let face of faces) {
       // Oeil droit
       push();
         translate(canvasWidth / 2 - 540 + 679, 198);
-        rotate(0.1),
+        rotate(6);
         beginClip();
           beginShape();
             vertex(26 + random(5, 21),37 + random(5, 21));
@@ -124,8 +197,8 @@ function draw() {
 
       // Oeil gauche
       push();
-      translate(canvasWidth / 2 - 540 + 161, 265);
-      rotate(-0.2);
+      translate(canvasWidth / 2 - 540 + 161 + random(5, 21), 265 + random(5, 21));
+      rotate(-12 + random(0.01, 0.07));
 
       beginClip();
         beginShape();
@@ -140,17 +213,17 @@ function draw() {
       background("#FFD0AB");
 
       const leftEyeMult = constrain(round(face.leftEye.centerX - face.leftIris.centerX), -3, 3);
-      const leftEyeX = leftEyeMult < -1 ? 190 : leftEyeMult > .25 ? 140 : null;
+      const leftIrisX = leftEyeMult < -2 ? "right" : leftEyeMult > -1.2 ? "left" : null;
       // console.log(leftEyeMult);
-      // console.log(leftEyeX);
+      // console.log(leftIrisX);
       fill("#2079B8");
-      switch (leftEyeX) {
-        case 140:
+      switch (leftIrisX) {
+        case "left":
           circle(120, 70.5, 131);
           fill("#080808");
           circle(110, 70.5, 58);
         break;
-        case 190:
+        case "right":
           circle(210, 70.5, 131);
           fill("#080808");
           circle(220, 70.5, 58);
