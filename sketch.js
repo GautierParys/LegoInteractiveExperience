@@ -68,7 +68,7 @@ function setup() {
 
   faceMesh.detectStart(video, gotFaces);
 
-  frameRate(10);
+  frameRate(8);
   noStroke();
   rectMode(CENTER);
   angleMode(DEGREES);
@@ -102,15 +102,14 @@ function draw() {
 
     beginClip();
       beginShape();
-        vertex(440,0);
-        vertex(169,35.5);
-        vertex(108.5,185);
-        vertex(0,291.5);
-        vertex(41,532);
-        vertex(242,596);
-        vertex(320.5,453.5);
-        vertex(472,316.5);
-        vertex(440,0);
+        vertex(440 + random(5, 21),0 + random(5, 21));
+        vertex(169 + random(5, 21),36 + random(5, 21));
+        vertex(109 + random(5, 21),185 + random(5, 21));
+        vertex(0 + random(5, 21),292 + random(5, 21));
+        vertex(41 + random(5, 21),532 + random(5, 21));
+        vertex(242 + random(5, 21),596 + random(5, 21));
+        vertex(321 + random(5, 21),454 + random(5, 21));
+        vertex(472 + random(5, 21),317 + random(5, 21));
       endShape();
     endClip();
 
@@ -122,21 +121,20 @@ function draw() {
 
     beginClip();
       beginShape();
-        vertex(510.765,287.475);
-        vertex(375.14,217.086);
-        vertex(325.473,81.5841);
-        vertex(239.449,0.636229);
-        vertex(64.6278,26.2642);
-        vertex(13.8614,93.0667);
-        vertex(0.985041,189.016);
-        vertex(14.4599,312.506);
-        vertex(182.697,432.665);
-        vertex(197.176,564.398);
-        vertex(361.887,551.577);
-        vertex(531.14,602.934);
-        vertex(541.05,393.768);
-        vertex(510.765,287.475);
-      endShape();
+        vertex(511 + random(5, 21),287 + random(5, 21));
+        vertex(375 + random(5, 21),217 + random(5, 21));
+        vertex(325 + random(5, 21),82 + random(5, 21));
+        vertex(239 + random(5, 21),1 + random(5, 21));
+        vertex(65 + random(5, 21),26 + random(5, 21));
+        vertex(14 + random(5, 21),93 + random(5, 21));
+        vertex(1 + random(5, 21),189 + random(5, 21));
+        vertex(14 + random(5, 21),313 + random(5, 21));
+        vertex(183 + random(5, 21),433 + random(5, 21));
+        vertex(197 + random(5, 21),564 + random(5, 21));
+        vertex(362 + random(5, 21),552 + random(5, 21));
+        vertex(531 + random(5, 21),603 + random(5, 21));
+        vertex(541 + random(5, 21),394 + random(5, 21));
+      endShape(CLOSE);
     endClip();
 
     image(grass, 0, 0);
@@ -147,22 +145,21 @@ function draw() {
 
     beginClip();
       beginShape();
-        vertex(0,152.774);
-        vertex(13.0914,46.9748);
-        vertex(192.782,0);
-        vertex(300.258,39.3572);
-        vertex(415.335,46.9748);
-        vertex(462,152.774);
-        vertex(372.26,197.844);
-        vertex(378.806,323.322);
-        vertex(451.151,449.011);
-        vertex(344.177,478);
-        vertex(223.741,468.69);
-        vertex(192.782,380.665);
-        vertex(96.2852,328.189);
-        vertex(70.1024,233.393);
-        vertex(0,152.774);
-      endShape();
+        vertex(0 + random(5, 21),153 + random(5, 21));
+        vertex(13 + random(5, 21),47 + random(5, 21));
+        vertex(193 + random(5, 21),0 + random(5, 21));
+        vertex(300 + random(5, 21),39 + random(5, 21));
+        vertex(415 + random(5, 21),47 + random(5, 21));
+        vertex(462 + random(5, 21),153 + random(5, 21));
+        vertex(372 + random(5, 21),198 + random(5, 21));
+        vertex(379 + random(5, 21),324 + random(5, 21));
+        vertex(451 + random(5, 21),449 + random(5, 21));
+        vertex(344 + random(5, 21),478 + random(5, 21));
+        vertex(224 + random(5, 21),469 + random(5, 21));
+        vertex(193 + random(5, 21),381 + random(5, 21));
+        vertex(96 + random(5, 21),328 + random(5, 21));
+        vertex(70 + random(5, 21),233 + random(5, 21));
+      endShape(CLOSE);
     endClip();
 
     image(grass, 0, 0);
@@ -192,7 +189,7 @@ function draw() {
           endShape(CLOSE);
         endClip();
 
-        image(rightEye, 0, 0);
+        image(rightEye, 0, 0, 283, 200);
       pop();
 
       // Oeil gauche
