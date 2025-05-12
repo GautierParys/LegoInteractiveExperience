@@ -1,8 +1,26 @@
 "use strict";
 
+// Définition des variables nécessaires à la détection de main
+let handPose;
+const HAND_OPTIONS = {
+  maxHands: 1,
+  flipped: true,
+  runtime: "tfjs",
+  modelType: "full",
+  detectorModelUrl: undefined, //default to use the tf.hub model
+  landmarkModelUrl: undefined, //default to use the tf.hub model
+};
+let hands = [];
+let isFingerClosed = false;
+let fingerLastpos; 
+
 // Définition des variables nécessaires à la détection de visage
 let faceMesh;
-const options = {maxFaces: 1, refineLandmarks: true, flipped: true, runtime: "mediapipe"};
+const OPTIONS = {maxFaces: 1,
+  refineLandmarks: true,
+  flipped: true,
+  runtime: "mediapipe"
+};
 let faces = [];
 
 let video;
@@ -12,61 +30,63 @@ let rightEye;
 let mouth;
 let backgroundImage;
 let grass;
+let openmouth;
+let closemouth;
 
 // Définition des noms des fonts
-let panchang_regular;
-let panchang_semibold;
-let panchang_extrabold;
+let panchangRegular;
+let panchangSemibold;
+let panchangExtrabold;
 
 // Scale
 const scaleMult = 1;
 
 // Taille du canva en fonction de la taille du navigateur
-// const canvasWidth = windowWidth;
-// const canvasHeight = windowHeight;
+// const CANVAS_WIDTH = windowWidth;
+// const CANVAS_HEIGHT = windowHeight;
 
 function preload() {
   //Prelaod du modèle de détection de visage
-  faceMesh = ml5.faceMesh(options);
+  faceMesh = ml5.faceMesh(OPTIONS);
+  handPose = ml5.handPose(HAND_OPTIONS);
   
   //Preload des images
   rightEye = loadImage("assets/images/VanGogh-Eye.jpg");
-  backgroundImage = loadImage("assets/images/water.jpg");
+  backgroundImage = loadImage("assets/images/water-blue.jpg");
   grass = loadImage("assets/images/grass.jpg");
+  openmouth = loadImage("assets/images/openmouth/Joseph_Ducreux_Self-Portrait.jpg");
+  closemouth = loadImage("assets/images/openmouth/Gian_Lorenzo_Bernini,_self-portrait.jpg");
 
   //Preload de la font Panchang
-  panchang_extrabold = loadFont("assets/fonts/Panchang-Extrabold.woff",
+  panchangExtrabold = loadFont("assets/fonts/Panchang-Extrabold.woff",
     () => console.log("Panchang extrabold loaded"),
     () => console.error("Panchang extrabold not loaded")
   );
-  panchang_semibold = loadFont("assets/fonts/Panchang-Semibold.woff",
+  panchangSemibold = loadFont("assets/fonts/Panchang-Semibold.woff",
     () => console.log("Panchang semibold loaded"),
     () => console.error("Panchang semibold not loaded")
   );
-  panchang_regular =loadFont("assets/fonts/Panchang-Regular.woff",
+  panchangRegular =loadFont("assets/fonts/Panchang-Regular.woff",
     () => console.log("Panchang regular loaded"),
     () => console.error("Panchang regular not loaded")
   );
 }
 
 function setup() {
-  // const baseWidth = 1600;
-  // const baseHeight = 900;
-  // const {canvasWidth, canvasHeight} = canvasUpdate(baseWidth, baseHeight);
+  const CANVAS_WIDTH = windowWidth;
+  const CANVAS_HEIGHT = windowHeight;
 
-  const canvasWidth = windowWidth;
-  const canvasHeight = windowHeight;
+  const VIDEO_WIDTH = 640;
+  const VIDEO_HEIGHT = 480;
 
-  const videoWidth = 640;
-  const videoHeight = 480;
-
-  createCanvas(canvasWidth, canvasHeight);
+  createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 
   video = createCapture(VIDEO);
-  video.size(videoWidth, videoHeight);
+  video.size(VIDEO_WIDTH, VIDEO_HEIGHT);
   video.hide();
 
   faceMesh.detectStart(video, gotFaces);
+  handPose.detectStart(video, gotHands);
 
   frameRate(8);
   noStroke();
@@ -75,8 +95,8 @@ function setup() {
 }
 
 function draw() {
-  const canvasWidth = windowWidth;
-  const canvasHeight = windowHeight;
+  const CANVAS_WIDTH = windowWidth;
+  const CANVAS_HEIGHT = windowHeight;
 
   background(255);
 
@@ -89,7 +109,7 @@ function draw() {
 
   push();
     beginClip();
-      square(canvasWidth / 2, canvasHeight / 2, 1080 * scaleMult);
+      square(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 1080 * scaleMult);
     endClip();
 
     image(backgroundImage, 0, 0);
@@ -98,7 +118,7 @@ function draw() {
 
   // Parcelles de terre
   push();
-    translate(canvasWidth / 2 - 540 + 653, 217);
+    translate(CANVAS_WIDTH / 2 - 540 + 653, 217);
 
     beginClip();
       beginShape();
@@ -117,7 +137,7 @@ function draw() {
   pop();
 
   push();
-    translate(canvasWidth / 2 - 540 - 86, -44);
+    translate(CANVAS_WIDTH / 2 - 540 - 86, -44);
 
     beginClip();
       beginShape();
@@ -141,7 +161,7 @@ function draw() {
   pop();
 
   push();
-    translate(canvasWidth / 2 - 540 + 106, 632);
+    translate(CANVAS_WIDTH / 2 - 540 + 106, 632);
 
     beginClip();
       beginShape();
@@ -169,7 +189,7 @@ function draw() {
     for (let face of faces) {
       // Oeil droit
       push();
-        translate(canvasWidth / 2 - 540 + 679, 198);
+        translate(CANVAS_WIDTH / 2 - 540 + 679, 198);
         rotate(6);
         beginClip();
           beginShape();
@@ -194,7 +214,7 @@ function draw() {
 
       // Oeil gauche
       push();
-      translate(canvasWidth / 2 - 540 + 161 + random(5, 21), 265 + random(5, 21));
+      translate(CANVAS_WIDTH / 2 - 540 + 161 + random(5, 21), 265 + random(5, 21));
       rotate(-12 + random(0.01, 0.07));
 
       beginClip();
@@ -234,7 +254,7 @@ function draw() {
 
       // Bouche
       push();
-        translate(canvasWidth / 2 - 540 + 315, 564);
+        translate(CANVAS_WIDTH / 2 - 540 + 315, 564);
 
         beginClip();
           beginShape();
@@ -256,37 +276,56 @@ function draw() {
           endShape(CLOSE);
         endClip();
 
-        image(rightEye, 0, 0);
+        if (face.lips.height <= 20) {
+          image(closemouth, 0, 0);
+        } else {
+          image(openmouth, 0, 0);
+        }
       pop();
     }
+    // Swipe
+
+    for (let hand of hands) {
+      const indexTipPos = createVector(round(hand.index_finger_tip.x), round(hand.index_finger_tip.y));
+      const thumbTipPos = createVector(round(hand.thumb_tip.x), round(hand.thumb_tip.y));
+
+      const fingerDist = round(dist(indexTipPos.x, indexTipPos.y, thumbTipPos.x, thumbTipPos.y));
+
+      if (fingerDist > 40) {
+        isFingerClosed = false;
+      }
+      if (isFingerClosed == false) {
+        if (fingerDist < 30) {
+          fingerLastpos = indexTipPos.x;
+          isFingerClosed = true;
+        }
+      }
+      if (isFingerClosed == true && indexTipPos.x >= fingerLastpos + 40) {
+        fill(0, 0, 0);
+        circle(0, 0, 100);
+      }
+
+      console.log(isFingerClosed);
+      console.log(fingerLastpos);
+    }
+
+    // Afficher la caméra
+    // image(video, 0, 0);
 }
 
 // Callback function for when faceMesh outputs data
 function gotFaces(results) {
   // Save the output to the faces variable
   faces = results;
-  console.log(faces);
+  // console.log(faces);
 }
 
-// function canvasUpdate (baseWidth, baseHeight) {
-//   const aspectRatio = baseWidth / baseHeight
-//   if (windowWidth / windowHeight > aspectRatio) {
-//     const canvasWidth = windowHeight * aspectRatio;
-//     const canvasHeight = windowHeight;
-//     const scaleFactor = canvasWidth / baseWidth;
-//     return {
-//       canvasWidth: canvasWidth,
-//       canvasHeight: canvasHeight,
-//       scaleFactor: scaleFactor
-//     };
-//   }
-
-//   return {
-//     canvasWidth: baseWidth,
-//     canvasHeight: baseHeight,
-//     scaleFactor: scaleFactor
-//   };
-// }
+// Callback function for when handPose outputs data
+function gotHands(results) {
+  // Save the output to the hands variable
+  hands = results;
+  // console.log(hands);
+}
 
 function windowResized () {
   preload();
