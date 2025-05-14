@@ -28,10 +28,12 @@ let video;
 // Définition des images
 let rightEye;
 let mouth;
-let backgroundImage;
+let waterBlue;
+let waterRed;
 let grass;
-let openmouth;
-let closemouth;
+let openedmouth;
+let closedmouth;
+let redSand;
 
 // Définition des noms des fonts
 let panchangRegular;
@@ -52,10 +54,12 @@ function preload() {
   
   //Preload des images
   rightEye = loadImage("assets/images/VanGogh-Eye.jpg");
-  backgroundImage = loadImage("assets/images/water-blue.jpg");
+  waterBlue = loadImage("assets/images/water-blue.jpg");
   grass = loadImage("assets/images/grass.jpg");
-  openmouth = loadImage("assets/images/openmouth/Joseph_Ducreux_Self-Portrait.jpg");
-  closemouth = loadImage("assets/images/openmouth/Gian_Lorenzo_Bernini,_self-portrait.jpg");
+  redSand = loadImage("assets/images/red-sand.jpg");
+  openedmouth = loadImage("assets/images/openedmouth/Joseph_Ducreux_Self-Portrait.jpg");
+  closedmouth = loadImage("assets/images/openedmouth/Gian_Lorenzo_Bernini,_self-portrait.jpg");
+  waterRed = loadImage("assets/images/water-red.jpg");
 
   //Preload de la font Panchang
   panchangExtrabold = loadFont("assets/fonts/Panchang-Extrabold.woff",
@@ -88,7 +92,7 @@ function setup() {
   faceMesh.detectStart(video, gotFaces);
   handPose.detectStart(video, gotHands);
 
-  frameRate(8);
+  frameRate(10);
   noStroke();
   rectMode(CENTER);
   angleMode(DEGREES);
@@ -97,6 +101,7 @@ function setup() {
 function draw() {
   const CANVAS_WIDTH = windowWidth;
   const CANVAS_HEIGHT = windowHeight;
+  const CANVAS_CENTER = createVector(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
 
   background(255);
 
@@ -107,12 +112,39 @@ function draw() {
   // // let textWid = textWidth(txt);
   // text(txt, 30, 90);
 
+  // Swipe
+
+  for (let hand of hands) {
+      const indexTipPos = createVector(round(hand.index_finger_tip.x), round(hand.index_finger_tip.y));
+      const thumbTipPos = createVector(round(hand.thumb_tip.x), round(hand.thumb_tip.y));
+
+      const fingerDist = round(dist(indexTipPos.x, indexTipPos.y, thumbTipPos.x, thumbTipPos.y));
+
+      if (fingerDist >= 40) {
+        isFingerClosed = false;
+      }
+
+      if (isFingerClosed == false) {
+        if (fingerDist < 30) {
+          fingerLastpos = indexTipPos.x;
+          isFingerClosed = true;
+        }
+      }
+      if (indexTipPos.x >= fingerLastpos + 30) {
+        fill(0, 0, 0);
+        circle(0, 0, 100);
+      }
+
+      console.log(isFingerClosed);
+      console.log(fingerLastpos);
+    }
+
   push();
     beginClip();
       square(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 1080 * scaleMult);
     endClip();
 
-    image(backgroundImage, 0, 0);
+    image(waterBlue, 0, 0);
   pop();
 
 
@@ -229,8 +261,8 @@ function draw() {
 
       background("#FFD0AB");
 
-      const leftEyeMult = constrain(round(face.leftEye.centerX - face.leftIris.centerX), -3, 3);
-      const leftIrisX = leftEyeMult < -2 ? "right" : leftEyeMult > -1.2 ? "left" : null;
+      const leftEyeMult = constrain((round(face.leftEye.centerX - face.leftIris.centerX) + round(face.rightEye.centerX - face.rightIris.centerX)) * 0.5, -1, 1);
+      const leftIrisX = leftEyeMult < -0.2 ? "right" : leftEyeMult > 0.2 ? "left" : null;
       // console.log(leftEyeMult);
       // console.log(leftIrisX);
       fill("#2079B8");
@@ -277,36 +309,11 @@ function draw() {
         endClip();
 
         if (face.lips.height <= 20) {
-          image(closemouth, 0, 0);
+          image(closedmouth, 0, 0);
         } else {
-          image(openmouth, 0, 0);
+          image(openedmouth, 0, 0);
         }
       pop();
-    }
-    // Swipe
-
-    for (let hand of hands) {
-      const indexTipPos = createVector(round(hand.index_finger_tip.x), round(hand.index_finger_tip.y));
-      const thumbTipPos = createVector(round(hand.thumb_tip.x), round(hand.thumb_tip.y));
-
-      const fingerDist = round(dist(indexTipPos.x, indexTipPos.y, thumbTipPos.x, thumbTipPos.y));
-
-      if (fingerDist > 40) {
-        isFingerClosed = false;
-      }
-      if (isFingerClosed == false) {
-        if (fingerDist < 30) {
-          fingerLastpos = indexTipPos.x;
-          isFingerClosed = true;
-        }
-      }
-      if (isFingerClosed == true && indexTipPos.x >= fingerLastpos + 40) {
-        fill(0, 0, 0);
-        circle(0, 0, 100);
-      }
-
-      console.log(isFingerClosed);
-      console.log(fingerLastpos);
     }
 
     // Afficher la caméra
