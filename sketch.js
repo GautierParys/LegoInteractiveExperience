@@ -31,8 +31,8 @@ let mouth;
 let waterBlue;
 let waterRed;
 let grass;
-let openedmouth;
-let closedmouth;
+let openedMouth;
+let closedMouth;
 let redSand;
 
 // Définition des noms des fonts
@@ -40,36 +40,53 @@ let panchangRegular;
 let panchangSemibold;
 let panchangExtrabold;
 
-// Scale
-const scaleMult = 1;
+// Class
 
-// Taille du canva en fonction de la taille du navigateur
-// const CANVAS_WIDTH = windowWidth;
-// const CANVAS_HEIGHT = windowHeight;
+class Face {
+  constructor(water, earth, rightEye, openedMouth, closedMouth) {
+    this.water = water;
+    this.earth = earth;
+    this.rightEye = rightEye;
+    this.openedMouth = openedMouth;
+    this.closedMouth = closedMouth;
+  }
+
+  swipe () {
+    this.water;
+    this.earth;
+  }
+}
 
 function preload() {
-  //Prelaod du modèle de détection de visage
+  // Prelaod du modèle de détection de visage
   faceMesh = ml5.faceMesh(OPTIONS);
   handPose = ml5.handPose(HAND_OPTIONS);
   
-  //Preload des images
-  rightEye = loadImage("assets/images/VanGogh-Eye.jpg");
+  // Preload des images
+    // Prelaod de l'eau
   waterBlue = loadImage("assets/images/water-blue.jpg");
+  waterRed = loadImage("assets/images/water-red.jpg");
+    // Preload de la terre
   grass = loadImage("assets/images/grass.jpg");
   redSand = loadImage("assets/images/red-sand.jpg");
-  openedmouth = loadImage("assets/images/openedmouth/Joseph_Ducreux_Self-Portrait.jpg");
-  closedmouth = loadImage("assets/images/openedmouth/Gian_Lorenzo_Bernini,_self-portrait.jpg");
-  waterRed = loadImage("assets/images/water-red.jpg");
+    // Preload de l'oeil droit
+  rightEye = loadImage("assets/images/VanGogh-Eye.jpg");
+    // Preload des bouches (ouvertes / fermées)
+  openedMouth = loadImage("assets/images/openedMouth/Joseph_Ducreux_Self-Portrait.jpg");
+  closedMouth = loadImage("assets/images/openedMouth/Gian_Lorenzo_Bernini,_self-portrait.jpg");
 
-  //Preload de la font Panchang
+  // Preload de la font Panchang
+    // Panchang Extra Bold
   panchangExtrabold = loadFont("assets/fonts/Panchang-Extrabold.woff",
     () => console.log("Panchang extrabold loaded"),
     () => console.error("Panchang extrabold not loaded")
   );
+    // Panchang Semi Bold
   panchangSemibold = loadFont("assets/fonts/Panchang-Semibold.woff",
     () => console.log("Panchang semibold loaded"),
     () => console.error("Panchang semibold not loaded")
   );
+    // Panchang Regular
   panchangRegular =loadFont("assets/fonts/Panchang-Regular.woff",
     () => console.log("Panchang regular loaded"),
     () => console.error("Panchang regular not loaded")
@@ -92,6 +109,8 @@ function setup() {
   faceMesh.detectStart(video, gotFaces);
   handPose.detectStart(video, gotHands);
 
+  let visage = new Face(waterBlue, grass, rightEye, openedMouth, closedMouth);
+
   frameRate(10);
   noStroke();
   rectMode(CENTER);
@@ -105,15 +124,7 @@ function draw() {
 
   background(255);
 
-  // textFont(panchang_extrabold);
-  // fill(0);
-  // textSize(80);
-  // let txt = "LEGO .1";
-  // // let textWid = textWidth(txt);
-  // text(txt, 30, 90);
-
   // Swipe
-
   for (let hand of hands) {
       const indexTipPos = createVector(round(hand.index_finger_tip.x), round(hand.index_finger_tip.y));
       const thumbTipPos = createVector(round(hand.thumb_tip.x), round(hand.thumb_tip.y));
@@ -141,7 +152,7 @@ function draw() {
 
   push();
     beginClip();
-      square(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 1080 * scaleMult);
+      square(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 1080);
     endClip();
 
     image(waterBlue, 0, 0);
@@ -309,9 +320,9 @@ function draw() {
         endClip();
 
         if (face.lips.height <= 20) {
-          image(closedmouth, 0, 0);
+          image(closedMouth, 0, 0);
         } else {
-          image(openedmouth, 0, 0);
+          image(openedMouth, 0, 0);
         }
       pop();
     }
