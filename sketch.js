@@ -1,22 +1,24 @@
 "use strict";
 
+const VIDEO_WIDTH = 640;
+const VIDEO_HEIGHT = 480;
+
 // Définition des variables nécessaires à la détection de main
 let handPose;
 const HAND_OPTIONS = {
   maxHands: 1,
   flipped: true,
   runtime: "tfjs",
-  modelType: "full",
-  detectorModelUrl: undefined, //default to use the tf.hub model
-  landmarkModelUrl: undefined, //default to use the tf.hub model
+  modelType: "lite",
 };
 let hands = [];
 let isFingerClosed = false;
-let fingerLastpos; 
+let fingerLastpos = null; 
 
 // Définition des variables nécessaires à la détection de visage
 let faceMesh;
-const OPTIONS = {maxFaces: 1,
+const OPTIONS = {
+  maxFaces: 1,
   refineLandmarks: true,
   flipped: true,
   runtime: "mediapipe"
@@ -26,79 +28,67 @@ let faces = [];
 let video;
 
 // Définition des images
+let waters = [];
+let earths = [];
+
 let rightEye;
 let mouth;
-let waterBlue;
-let waterRed;
-let grass;
 let openedMouth;
 let closedMouth;
-let redSand;
+
+let currentFace;
+let lastSwipeTime = 0;
 
 // Définition des noms des fonts
 let panchangRegular;
 let panchangSemibold;
 let panchangExtrabold;
 
-// Class
-
-class Face {
-  constructor(water, earth, rightEye, openedMouth, closedMouth) {
-    this.water = water;
-    this.earth = earth;
-    this.rightEye = rightEye;
-    this.openedMouth = openedMouth;
-    this.closedMouth = closedMouth;
-  }
-
-  swipe () {
-    this.water;
-    this.earth;
-  }
-}
-
 function preload() {
   // Prelaod du modèle de détection de visage
   faceMesh = ml5.faceMesh(OPTIONS);
   handPose = ml5.handPose(HAND_OPTIONS);
   
-  // Preload des images
-    // Prelaod de l'eau
-  waterBlue = loadImage("assets/images/water-blue.jpg");
-  waterRed = loadImage("assets/images/water-red.jpg");
-    // Preload de la terre
-  grass = loadImage("assets/images/grass.jpg");
-  redSand = loadImage("assets/images/red-sand.jpg");
-    // Preload de l'oeil droit
+  // Prelaod de l'eau
+  for (let i = 1; i <= 2; i++) {
+    waters.push(loadImage("assets/images/waters/water-"+ i +".jpg"));
+  }
+  // Preload de la terre
+  for (let i = 1; i <= 2; i++) {
+    earths.push(loadImage("assets/images/earths/earth-"+ i +".jpg"));
+  }
+  // Preload de l'oeil droit
   rightEye = loadImage("assets/images/VanGogh-Eye.jpg");
-    // Preload des bouches (ouvertes / fermées)
+  // Preload des bouches (ouvertes / fermées)
   openedMouth = loadImage("assets/images/openedMouth/Joseph_Ducreux_Self-Portrait.jpg");
   closedMouth = loadImage("assets/images/openedMouth/Gian_Lorenzo_Bernini,_self-portrait.jpg");
 
-  // Preload de la font Panchang
-    // Panchang Extra Bold
-  panchangExtrabold = loadFont("assets/fonts/Panchang-Extrabold.woff",
-    () => console.log("Panchang extrabold loaded"),
-    () => console.error("Panchang extrabold not loaded")
-  );
-    // Panchang Semi Bold
-  panchangSemibold = loadFont("assets/fonts/Panchang-Semibold.woff",
-    () => console.log("Panchang semibold loaded"),
-    () => console.error("Panchang semibold not loaded")
-  );
-    // Panchang Regular
-  panchangRegular =loadFont("assets/fonts/Panchang-Regular.woff",
-    () => console.log("Panchang regular loaded"),
-    () => console.error("Panchang regular not loaded")
-  );
+  // // Preload Panchang Extra Bold
+  // panchangExtrabold = loadFont("assets/fonts/Panchang-Extrabold.woff",
+  //   () => console.log("Panchang extrabold loaded"),
+  //   () => console.error("Panchang extrabold not loaded")
+  // );
+  // // Preload Panchang Semi Bold
+  // panchangSemibold = loadFont("assets/fonts/Panchang-Semibold.woff",
+  //   () => console.log("Panchang semibold loaded"),
+  //   () => console.error("Panchang semibold not loaded")
+  // );
+  // // Preload Panchang Regular
+  // panchangRegular =loadFont("assets/fonts/Panchang-Regular.woff",
+  //   () => console.log("Panchang regular loaded"),
+  //   () => console.error("Panchang regular not loaded")
+  // );
 }
 
 function setup() {
   const CANVAS_WIDTH = windowWidth;
   const CANVAS_HEIGHT = windowHeight;
 
-  const VIDEO_WIDTH = 640;
-  const VIDEO_HEIGHT = 480;
+  currentFace = {
+    faceID: 0,
+    water: waters[0],
+    earth: earths[0]
+  }
 
   createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -109,9 +99,7 @@ function setup() {
   faceMesh.detectStart(video, gotFaces);
   handPose.detectStart(video, gotHands);
 
-  let visage = new Face(waterBlue, grass, rightEye, openedMouth, closedMouth);
-
-  frameRate(10);
+  frameRate(12);
   noStroke();
   rectMode(CENTER);
   angleMode(DEGREES);
@@ -124,6 +112,8 @@ function draw() {
 
   background(255);
 
+  const now = millis();
+
   // Swipe
   for (let hand of hands) {
       const indexTipPos = createVector(round(hand.index_finger_tip.x), round(hand.index_finger_tip.y));
@@ -131,19 +121,23 @@ function draw() {
 
       const fingerDist = round(dist(indexTipPos.x, indexTipPos.y, thumbTipPos.x, thumbTipPos.y));
 
-      if (fingerDist >= 40) {
+      if (isFingerClosed && fingerDist >= 50) {
         isFingerClosed = false;
       }
 
-      if (isFingerClosed == false) {
-        if (fingerDist < 30) {
+      if (!isFingerClosed && fingerDist < 20) {
           fingerLastpos = indexTipPos.x;
           isFingerClosed = true;
-        }
       }
-      if (indexTipPos.x >= fingerLastpos + 30) {
+
+      if (indexTipPos.x > fingerLastpos + 20 && isFingerClosed && now - lastSwipeTime > 2000) {
         fill(0, 0, 0);
-        circle(0, 0, 100);
+        circle(0, CANVAS_HEIGHT, 500);
+        currentFace.faceID = currentFace.faceID == 1 ? currentFace.faceID = 0 : currentFace.faceID + 1;
+        currentFace.water = waters[currentFace.faceID];
+        currentFace.earth = earths[currentFace.faceID];
+        lastSwipeTime = now;
+        fingerLastpos = null;
       }
 
       console.log(isFingerClosed);
@@ -155,7 +149,7 @@ function draw() {
       square(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 1080);
     endClip();
 
-    image(waterBlue, 0, 0);
+    image(currentFace.water, 0, 0);
   pop();
 
 
@@ -176,7 +170,7 @@ function draw() {
       endShape();
     endClip();
 
-    image(grass, 0, 0);
+    image(currentFace.earth, 0, 0);
   pop();
 
   push();
@@ -200,7 +194,7 @@ function draw() {
       endShape(CLOSE);
     endClip();
 
-    image(grass, 0, 0);
+    image(currentFace.earth, 0, 0);
   pop();
 
   push();
@@ -225,7 +219,7 @@ function draw() {
       endShape(CLOSE);
     endClip();
 
-    image(grass, 0, 0);
+    image(currentFace.earth, 0, 0);
   pop();
 
 
@@ -319,7 +313,7 @@ function draw() {
           endShape(CLOSE);
         endClip();
 
-        if (face.lips.height <= 20) {
+        if (face.lips.height <= 40) {
           image(closedMouth, 0, 0);
         } else {
           image(openedMouth, 0, 0);
@@ -328,7 +322,7 @@ function draw() {
     }
 
     // Afficher la caméra
-    // image(video, 0, 0);
+    image(video, 0, 0);
 }
 
 // Callback function for when faceMesh outputs data
@@ -342,10 +336,10 @@ function gotFaces(results) {
 function gotHands(results) {
   // Save the output to the hands variable
   hands = results;
-  // console.log(hands);
+  console.log(hands);
 }
 
 function windowResized () {
-  preload();
+  // preload();
   setup();
 }
