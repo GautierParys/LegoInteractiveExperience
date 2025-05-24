@@ -1,7 +1,5 @@
 "use strict";
 
-const VIDEO_WIDTH = 640;
-const VIDEO_HEIGHT = 480;
 
 // Définition des variables nécessaires à la détection de main
 let handPose;
@@ -12,8 +10,7 @@ const HAND_OPTIONS = {
   modelType: "lite",
 };
 let hands = [];
-let isFingerClosed = false;
-let fingerLastpos = null; 
+let fingerLastpos; 
 
 // Définition des variables nécessaires à la détection de visage
 let faceMesh;
@@ -31,13 +28,17 @@ let video;
 let waters = [];
 let earths = [];
 
-let rightEye;
+let rightEyes = [];
+
 let mouth;
 let openedMouth;
 let closedMouth;
 
 let currentFace;
-let lastSwipeTime = 0;
+let justSwiped = false;
+let temp = 164.5;
+
+let modelsLoaded = false;
 
 // Définition des noms des fonts
 let panchangRegular;
@@ -48,20 +49,26 @@ function preload() {
   // Prelaod du modèle de détection de visage
   faceMesh = ml5.faceMesh(OPTIONS);
   handPose = ml5.handPose(HAND_OPTIONS);
+
+  
+  
   
   // Prelaod de l'eau
-  for (let i = 1; i <= 2; i++) {
+  for (let i = 1; i <= 3; i++) {
     waters.push(loadImage("assets/images/waters/water-"+ i +".jpg"));
   }
   // Preload de la terre
-  for (let i = 1; i <= 2; i++) {
+  for (let i = 1; i <= 3; i++) {
     earths.push(loadImage("assets/images/earths/earth-"+ i +".jpg"));
   }
   // Preload de l'oeil droit
-  rightEye = loadImage("assets/images/VanGogh-Eye.jpg");
+  for (let i = 1; i <= 3; i++) {
+    rightEyes.push(loadImage("assets/images/rightEyes/rightEye-"+ i +".jpg"));
+  }
   // Preload des bouches (ouvertes / fermées)
   openedMouth = loadImage("assets/images/openedMouth/Joseph_Ducreux_Self-Portrait.jpg");
   closedMouth = loadImage("assets/images/openedMouth/Gian_Lorenzo_Bernini,_self-portrait.jpg");
+
 
   // // Preload Panchang Extra Bold
   // panchangExtrabold = loadFont("assets/fonts/Panchang-Extrabold.woff",
@@ -73,11 +80,11 @@ function preload() {
   //   () => console.log("Panchang semibold loaded"),
   //   () => console.error("Panchang semibold not loaded")
   // );
-  // // Preload Panchang Regular
-  // panchangRegular =loadFont("assets/fonts/Panchang-Regular.woff",
-  //   () => console.log("Panchang regular loaded"),
-  //   () => console.error("Panchang regular not loaded")
-  // );
+  // Preload Panchang Regular
+  panchangRegular =loadFont("assets/fonts/Panchang-Regular.woff",
+    () => console.log("Panchang regular loaded"),
+    () => console.error("Panchang regular not loaded")
+  );
 }
 
 function setup() {
@@ -87,13 +94,13 @@ function setup() {
   currentFace = {
     faceID: 0,
     water: waters[0],
-    earth: earths[0]
+    earth: earths[0],
+    rightEye: rightEyes[round(random(0, 2))]
   }
 
   createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 
   video = createCapture(VIDEO);
-  video.size(VIDEO_WIDTH, VIDEO_HEIGHT);
   video.hide();
 
   faceMesh.detectStart(video, gotFaces);
@@ -103,130 +110,140 @@ function setup() {
   noStroke();
   rectMode(CENTER);
   angleMode(DEGREES);
+
+  // Text
+  textAlign(CENTER, CENTER);
+  textFont(panchangRegular);
+  textSize(16);
 }
 
 function draw() {
+  // console.log("draw loop tourne");
+
   const CANVAS_WIDTH = windowWidth;
   const CANVAS_HEIGHT = windowHeight;
   const CANVAS_CENTER = createVector(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+  
+  background(245);
 
-  background(255);
+  if (faces.length > 0 && hands.length > 0) {
+    modelsLoaded = true;
+  } else {
+    fill(8);
+    text("Tracking models are loading please wait...", CANVAS_CENTER.x, CANVAS_CENTER.y);
+  }
 
-  const now = millis();
-
-  // Swipe
-  for (let hand of hands) {
-      const indexTipPos = createVector(round(hand.index_finger_tip.x), round(hand.index_finger_tip.y));
-      const thumbTipPos = createVector(round(hand.thumb_tip.x), round(hand.thumb_tip.y));
-
-      const fingerDist = round(dist(indexTipPos.x, indexTipPos.y, thumbTipPos.x, thumbTipPos.y));
-
-      if (isFingerClosed && fingerDist >= 50) {
-        isFingerClosed = false;
-      }
-
-      if (!isFingerClosed && fingerDist < 20) {
-          fingerLastpos = indexTipPos.x;
-          isFingerClosed = true;
-      }
-
-      if (indexTipPos.x > fingerLastpos + 20 && isFingerClosed && now - lastSwipeTime > 2000) {
-        fill(0, 0, 0);
-        circle(0, CANVAS_HEIGHT, 500);
-        currentFace.faceID = currentFace.faceID == 1 ? currentFace.faceID = 0 : currentFace.faceID + 1;
-        currentFace.water = waters[currentFace.faceID];
-        currentFace.earth = earths[currentFace.faceID];
-        lastSwipeTime = now;
-        fingerLastpos = null;
-      }
-
-      console.log(isFingerClosed);
-      console.log(fingerLastpos);
-    }
-
-  push();
-    beginClip();
-      square(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 1080);
-    endClip();
-
-    image(currentFace.water, 0, 0);
-  pop();
-
-
-  // Parcelles de terre
-  push();
-    translate(CANVAS_WIDTH / 2 - 540 + 653, 217);
-
-    beginClip();
-      beginShape();
-        vertex(440 + random(5, 21),0 + random(5, 21));
-        vertex(169 + random(5, 21),36 + random(5, 21));
-        vertex(109 + random(5, 21),185 + random(5, 21));
-        vertex(0 + random(5, 21),292 + random(5, 21));
-        vertex(41 + random(5, 21),532 + random(5, 21));
-        vertex(242 + random(5, 21),596 + random(5, 21));
-        vertex(321 + random(5, 21),454 + random(5, 21));
-        vertex(472 + random(5, 21),317 + random(5, 21));
-      endShape();
-    endClip();
-
-    image(currentFace.earth, 0, 0);
-  pop();
-
-  push();
-    translate(CANVAS_WIDTH / 2 - 540 - 86, -44);
-
-    beginClip();
-      beginShape();
-        vertex(511 + random(5, 21),287 + random(5, 21));
-        vertex(375 + random(5, 21),217 + random(5, 21));
-        vertex(325 + random(5, 21),82 + random(5, 21));
-        vertex(239 + random(5, 21),1 + random(5, 21));
-        vertex(65 + random(5, 21),26 + random(5, 21));
-        vertex(14 + random(5, 21),93 + random(5, 21));
-        vertex(1 + random(5, 21),189 + random(5, 21));
-        vertex(14 + random(5, 21),313 + random(5, 21));
-        vertex(183 + random(5, 21),433 + random(5, 21));
-        vertex(197 + random(5, 21),564 + random(5, 21));
-        vertex(362 + random(5, 21),552 + random(5, 21));
-        vertex(531 + random(5, 21),603 + random(5, 21));
-        vertex(541 + random(5, 21),394 + random(5, 21));
-      endShape(CLOSE);
-    endClip();
-
-    image(currentFace.earth, 0, 0);
-  pop();
-
-  push();
-    translate(CANVAS_WIDTH / 2 - 540 + 106, 632);
-
-    beginClip();
-      beginShape();
-        vertex(0 + random(5, 21),153 + random(5, 21));
-        vertex(13 + random(5, 21),47 + random(5, 21));
-        vertex(193 + random(5, 21),0 + random(5, 21));
-        vertex(300 + random(5, 21),39 + random(5, 21));
-        vertex(415 + random(5, 21),47 + random(5, 21));
-        vertex(462 + random(5, 21),153 + random(5, 21));
-        vertex(372 + random(5, 21),198 + random(5, 21));
-        vertex(379 + random(5, 21),324 + random(5, 21));
-        vertex(451 + random(5, 21),449 + random(5, 21));
-        vertex(344 + random(5, 21),478 + random(5, 21));
-        vertex(224 + random(5, 21),469 + random(5, 21));
-        vertex(193 + random(5, 21),381 + random(5, 21));
-        vertex(96 + random(5, 21),328 + random(5, 21));
-        vertex(70 + random(5, 21),233 + random(5, 21));
-      endShape(CLOSE);
-    endClip();
-
-    image(currentFace.earth, 0, 0);
-  pop();
-
+  if (modelsLoaded == true) {
+    background(245);
+    fill(8);
+    text("No face detected", CANVAS_CENTER.x, CANVAS_CENTER.y);
 
     for (let face of faces) {
+      for (let hand of hands) {
+
+        // Swipe
+        const indexTipPos = createVector(round(hand.index_finger_tip.x), round(hand.index_finger_tip.y));
+        const thumbTipPos = createVector(round(hand.thumb_tip.x), round(hand.thumb_tip.y));
+
+        const fingerDist = round(dist(0, indexTipPos.y, 0, thumbTipPos.y));
+
+        if (fingerDist <= 15 && indexTipPos.x > fingerLastpos + 10 && !justSwiped) {
+          currentFace.faceID = currentFace.faceID == 2 ? currentFace.faceID = 0 : currentFace.faceID + 1;
+          currentFace.water = waters[currentFace.faceID];
+          currentFace.earth = earths[currentFace.faceID];
+          justSwiped = true;
+        } else if (fingerDist > 15) {
+          justSwiped = false;
+          fingerLastpos = indexTipPos.x;
+        }
+
+        // console.log("is finger closed : " + justSwiped);
+        // console.log("index las pos : " + fingerLastpos);
+        // console.log("index pos : " + indexTipPos.x);
+      }
+
+      push();
+        beginClip();
+          square(CANVAS_CENTER.x, CANVAS_CENTER.y, 1080);
+        endClip();
+
+        image(currentFace.water, 0, 0);
+      pop();
+
+
+      // Parcelles de terre
+      push();
+        translate(CANVAS_CENTER.x - 540 + 653, 217);
+
+        beginClip();
+          beginShape();
+            vertex(440 + random(5, 21),0 + random(5, 21));
+            vertex(169 + random(5, 21),36 + random(5, 21));
+            vertex(109 + random(5, 21),185 + random(5, 21));
+            vertex(0 + random(5, 21),292 + random(5, 21));
+            vertex(41 + random(5, 21),532 + random(5, 21));
+            vertex(242 + random(5, 21),596 + random(5, 21));
+            vertex(321 + random(5, 21),454 + random(5, 21));
+            vertex(472 + random(5, 21),317 + random(5, 21));
+          endShape();
+        endClip();
+
+        image(currentFace.earth, 0, 0);
+      pop();
+
+      push();
+        translate(CANVAS_CENTER.x - 540 - 86, -44);
+
+        beginClip();
+          beginShape();
+            vertex(511 + random(5, 21),287 + random(5, 21));
+            vertex(375 + random(5, 21),217 + random(5, 21));
+            vertex(325 + random(5, 21),82 + random(5, 21));
+            vertex(239 + random(5, 21),1 + random(5, 21));
+            vertex(65 + random(5, 21),26 + random(5, 21));
+            vertex(14 + random(5, 21),93 + random(5, 21));
+            vertex(1 + random(5, 21),189 + random(5, 21));
+            vertex(14 + random(5, 21),313 + random(5, 21));
+            vertex(183 + random(5, 21),433 + random(5, 21));
+            vertex(197 + random(5, 21),564 + random(5, 21));
+            vertex(362 + random(5, 21),552 + random(5, 21));
+            vertex(531 + random(5, 21),603 + random(5, 21));
+            vertex(541 + random(5, 21),394 + random(5, 21));
+          endShape(CLOSE);
+        endClip();
+
+        image(currentFace.earth, 0, 0);
+      pop();
+
+      push();
+        translate(CANVAS_CENTER.x - 540 + 106, 632);
+
+        beginClip();
+          beginShape();
+            vertex(0 + random(5, 21),153 + random(5, 21));
+            vertex(13 + random(5, 21),47 + random(5, 21));
+            vertex(193 + random(5, 21),0 + random(5, 21));
+            vertex(300 + random(5, 21),39 + random(5, 21));
+            vertex(415 + random(5, 21),47 + random(5, 21));
+            vertex(462 + random(5, 21),153 + random(5, 21));
+            vertex(372 + random(5, 21),198 + random(5, 21));
+            vertex(379 + random(5, 21),324 + random(5, 21));
+            vertex(451 + random(5, 21),449 + random(5, 21));
+            vertex(344 + random(5, 21),478 + random(5, 21));
+            vertex(224 + random(5, 21),469 + random(5, 21));
+            vertex(193 + random(5, 21),381 + random(5, 21));
+            vertex(96 + random(5, 21),328 + random(5, 21));
+            vertex(70 + random(5, 21),233 + random(5, 21));
+          endShape(CLOSE);
+        endClip();
+
+        image(currentFace.earth, 0, 0);
+      pop();
+
+
       // Oeil droit
       push();
-        translate(CANVAS_WIDTH / 2 - 540 + 679, 198);
+        translate(CANVAS_CENTER.x - 540 + 679, 198);
         rotate(6);
         beginClip();
           beginShape();
@@ -246,12 +263,12 @@ function draw() {
           endShape(CLOSE);
         endClip();
 
-        image(rightEye, 0, 0, 283, 200);
+        image(currentFace.rightEye, 0, 0, 283, 200);
       pop();
 
       // Oeil gauche
       push();
-      translate(CANVAS_WIDTH / 2 - 540 + 161 + random(5, 21), 265 + random(5, 21));
+      translate(CANVAS_CENTER.x - 540 + 161 + random(5, 21), 265 + random(5, 21));
       rotate(-12 + random(0.01, 0.07));
 
       beginClip();
@@ -266,32 +283,32 @@ function draw() {
 
       background("#FFD0AB");
 
-      const leftEyeMult = constrain((round(face.leftEye.centerX - face.leftIris.centerX) + round(face.rightEye.centerX - face.rightIris.centerX)) * 0.5, -1, 1);
-      const leftIrisX = leftEyeMult < -0.2 ? "right" : leftEyeMult > 0.2 ? "left" : null;
-      // console.log(leftEyeMult);
-      // console.log(leftIrisX);
-      fill("#2079B8");
-      switch (leftIrisX) {
-        case "left":
-          circle(120, 70.5, 131);
-          fill("#080808");
-          circle(110, 70.5, 58);
-        break;
-        case "right":
-          circle(210, 70.5, 131);
-          fill("#080808");
-          circle(220, 70.5, 58);
-        break;
-        default:
-          circle(164.5, 70.5, 131);
-          fill("#080808");
-          circle(164.5, 70.5, 58);
+      const leftEyeMult = (round(face.leftEye.centerX - face.leftIris.centerX) + round(face.rightEye.centerX - face.rightIris.centerX)) * 0.5;
+
+      let currentPosC1;
+      let currentPosC2;
+      
+      if (leftEyeMult > 2) {
+        currentPosC1 = 120;
+        currentPosC2 = 110;
+      } else if (leftEyeMult < -1) {
+        currentPosC1 = 210;
+        currentPosC2 = 220;
+      } else {
+        currentPosC1 = 164.5;
+        currentPosC2 = 164.5;
       }
+
+      fill("#2079B8");
+      circle(currentPosC1, 70.5, 131);
+      fill("#080808");
+      circle(currentPosC2, 70.5, 58);
+
       pop();
 
       // Bouche
       push();
-        translate(CANVAS_WIDTH / 2 - 540 + 315, 564);
+        translate(CANVAS_CENTER.x - 540 + 315, 564);
 
         beginClip();
           beginShape();
@@ -320,9 +337,10 @@ function draw() {
         }
       pop();
     }
+  }
 
     // Afficher la caméra
-    image(video, 0, 0);
+    // image(video, 0, 0);
 }
 
 // Callback function for when faceMesh outputs data
@@ -336,10 +354,10 @@ function gotFaces(results) {
 function gotHands(results) {
   // Save the output to the hands variable
   hands = results;
-  console.log(hands);
+  // console.log(hands);
 }
 
 function windowResized () {
-  // preload();
+  preload();
   setup();
 }
