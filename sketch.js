@@ -30,9 +30,8 @@ let earths = [];
 
 let rightEyes = [];
 
-let mouth;
 let openedMouth;
-let closedMouth;
+let closedMouth = [];
 
 let currentFace;
 let justSwiped = false;
@@ -62,11 +61,14 @@ function preload() {
     earths.push(loadImage("assets/images/earths/earth-"+ i +".jpg"));
   }
   // Preload de l'oeil droit
-  for (let i = 1; i <= 3; i++) {
-    rightEyes.push(loadImage("assets/images/rightEyes/rightEye-"+ i +".jpg"));
+  for (let i = 1; i <= 5; i++) {
+    rightEyes.push(loadImage("assets/images/rightEyes/rightEye-"+ i +".png"));
   }
   // Preload des bouches (ouvertes / fermées)
   openedMouth = loadImage("assets/images/openedMouth/Joseph_Ducreux_Self-Portrait.jpg");
+  for (let i = 1; i <= 5; i++) {
+    rightEyes.push(loadImage("assets/images/closedmouth/closedmouth-"+ i +".png"));
+  }
   closedMouth = loadImage("assets/images/openedMouth/Gian_Lorenzo_Bernini,_self-portrait.jpg");
 
 
@@ -81,7 +83,7 @@ function preload() {
   //   () => console.error("Panchang semibold not loaded")
   // );
   // Preload Panchang Regular
-  panchangRegular =loadFont("assets/fonts/Panchang-Regular.woff",
+  panchangRegular = loadFont("assets/fonts/Panchang-Regular.woff",
     () => console.log("Panchang regular loaded"),
     () => console.error("Panchang regular not loaded")
   );
@@ -95,7 +97,8 @@ function setup() {
     faceID: 0,
     water: waters[0],
     earth: earths[0],
-    rightEye: rightEyes[round(random(0, 2))]
+    rightEye: rightEyes[round(random(0, 4))],
+    mouthclosed: mouthclosed[round(random(0, 4))]
   }
 
   createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -333,7 +336,7 @@ function draw() {
         endClip();
 
         if (face.lips.height <= 40) {
-          image(closedMouth, 0, 0);
+          image(currentFace.closedMouth, 0, 0);
         } else {
           image(openedMouth, 0, 0);
         }
