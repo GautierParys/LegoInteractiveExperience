@@ -1,3 +1,13 @@
+// Ce code présente mon projet d'IA Lego.
+/**
+Pour le réaliser, j'ai à la fois fait de simples recherches sur internet, fait des recherches sur des sites tel que
+stack overflow ou encore utiliser chat GPT. 
+Il est à noter que chat GPT n'était présent lors du développement de ce projet que pour m'expliquer certaines notions de p5js
+lorsque mes propres recherches n'étaient pas concluentes mais aussi pour m'aider à comprendre d'où venaient certaines erreurs.
+*/
+// La librairie que j'utilise pour le tracking de la tête et de la main est ml5js (https://ml5js.org/).
+
+
 "use strict";
 
 
@@ -22,9 +32,10 @@ const OPTIONS = {
 };
 let faces = [];
 
+// Définition de la variable nécessaire à la capture vidéo
 let video;
 
-// Définition des images
+// Définition des lites contenants les images
 let waters = [];
 let earths = [];
 
@@ -34,16 +45,18 @@ let openedMouth;
 let closedMouths = [];
 
 let currentFace;
-let justSwiped = false;
-let temp = 164.5;
 
+// Définition de la variable nécessaire au swipe
+let justSwiped = false;
+
+// Définition de la variable de détection du chargement des models
 let modelsLoaded = false;
 
-// Définition des noms des fonts
+// Définition du nom de la font
 let panchangRegular;
-let panchangSemibold;
-let panchangExtrabold;
 
+
+// Fonction chargeant des éléments avant le reste du code
 function preload() {
   // Prelaod du modèle de détection de visage
   faceMesh = ml5.faceMesh(OPTIONS);
@@ -52,15 +65,15 @@ function preload() {
   
   
   
-  // Prelaod de l'eau
+  // Prelaod des imagers d'eau
   for (let i = 1; i <= 3; i++) {
     waters.push(loadImage("assets/images/waters/water-"+ i +".jpg"));
   }
-  // Preload de la terre
+  // Preload des images de terre
   for (let i = 1; i <= 3; i++) {
     earths.push(loadImage("assets/images/earths/earth-"+ i +".jpg"));
   }
-  // Preload de l'oeil droit
+  // Preload des images de l'oeil droit
   for (let i = 1; i <= 5; i++) {
     rightEyes.push(loadImage("assets/images/rightEyes/rightEye-"+ i +".png"));
   }
@@ -71,16 +84,7 @@ function preload() {
   openedMouth = loadImage("assets/images/openedMouth/Joseph_Ducreux_Self-Portrait.jpg");
 
 
-  // // Preload Panchang Extra Bold
-  // panchangExtrabold = loadFont("assets/fonts/Panchang-Extrabold.woff",
-  //   () => console.log("Panchang extrabold loaded"),
-  //   () => console.error("Panchang extrabold not loaded")
-  // );
-  // // Preload Panchang Semi Bold
-  // panchangSemibold = loadFont("assets/fonts/Panchang-Semibold.woff",
-  //   () => console.log("Panchang semibold loaded"),
-  //   () => console.error("Panchang semibold not loaded")
-  // );
+
   // Preload Panchang Regular
   panchangRegular = loadFont("assets/fonts/Panchang-Regular.woff",
     () => console.log("Panchang regular loaded"),
@@ -89,9 +93,13 @@ function preload() {
 }
 
 function setup() {
+  // Met la taille du canvas à la taille de la fenêtre
   const CANVAS_WIDTH = windowWidth;
   const CANVAS_HEIGHT = windowHeight;
 
+  createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  //  Définit les différent éléments constituants le visage et étants modifiables
   currentFace = {
     faceID: 0,
     water: waters[0],
@@ -100,35 +108,37 @@ function setup() {
     closedMouth: closedMouths[round(random(0, 2))]
   }
 
-  createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
-
+  // Capture de la vidéo
   video = createCapture(VIDEO);
   video.hide();
 
+  // Démarre les modèles de détection de visages et de mains
   faceMesh.detectStart(video, gotFaces);
   handPose.detectStart(video, gotHands);
 
+  // Définition des règles globales du canevas 
   frameRate(12);
   noStroke();
   rectMode(CENTER);
   angleMode(DEGREES);
 
-  // Text
+  // Définition des règles relatives au texte
   textAlign(CENTER, TOP);
   textFont(panchangRegular);
   textSize(16);
 }
 
 function draw() {
-  // console.log("draw loop tourne");
 
+  // Redéfinition de la taille du canevas plus son centre
   const CANVAS_WIDTH = windowWidth;
   const CANVAS_HEIGHT = windowHeight;
   const CANVAS_CENTER = createVector(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
-  const mouse = createVector(mouseX, mouseY);
   
+  // Met l'arrière plan en blanc
   background(245);
 
+  // Système d'écran de chargement et de chargement des modèles
   if (faces.length > 0 && hands.length > 0) {
     modelsLoaded = true;
   } else {
@@ -138,14 +148,16 @@ function draw() {
   }
 
   if (modelsLoaded == true) {
+    // Retire le texte précédent et affiche un autre
     background(245);
     fill(8);
     text("No face detected", CANVAS_CENTER.x, CANVAS_CENTER.y);
 
+
     for (let face of faces) {
       for (let hand of hands) {
 
-        // Swipe
+        // Système de swipe de visage
         const indexTipPos = createVector(round(hand.index_finger_tip.x), round(hand.index_finger_tip.y));
         const thumbTipPos = createVector(round(hand.thumb_tip.x), round(hand.thumb_tip.y));
 
@@ -160,12 +172,9 @@ function draw() {
           justSwiped = false;
           fingerLastpos = indexTipPos.x;
         }
-
-        // console.log("is finger closed : " + justSwiped);
-        // console.log("index las pos : " + fingerLastpos);
-        // console.log("index pos : " + indexTipPos.x);
       }
 
+      // Arrière plan du visage
       push();
         beginClip();
           square(CANVAS_CENTER.x, CANVAS_CENTER.y, 1080);
@@ -245,7 +254,7 @@ function draw() {
       pop();
 
 
-      // Oeil droit
+      // Oeil droit (par rapport à l'utilisateur)
       push();
         translate(CANVAS_CENTER.x - 540 + 679, 198);
         rotate(6);
@@ -270,7 +279,7 @@ function draw() {
         image(currentFace.rightEye, 0, 0, 283, 200);
       pop();
 
-      // Oeil gauche
+      // Oeil gauche (par rapport à l'utilisateur)
       push();
       translate(CANVAS_CENTER.x - 540 + 161 + random(5, 21), 265 + random(5, 21));
       rotate(-12 + random(0.01, 0.07));
@@ -287,6 +296,8 @@ function draw() {
 
       background("#FFD0AB");
 
+
+      // Gestion du mouvement de l'oeil en fonction de ceux de l'utilisateur
       const leftEyeMult = (round(face.leftEye.centerX - face.leftIris.centerX) + round(face.rightEye.centerX - face.rightIris.centerX)) * 0.5;
 
       let currentPosC1;
@@ -334,6 +345,7 @@ function draw() {
           endShape(CLOSE);
         endClip();
 
+        // Gestion de la bouche ouverte ou fermée en fonction de celle de l'utilisateur
         if (face.lips.height <= 40) {
           image(currentFace.closedMouth, 0, 0, 522, 261);
         } else {
@@ -347,20 +359,19 @@ function draw() {
     // image(video, 0, 0);
 }
 
-// Callback function for when faceMesh outputs data
+// Fonction qui récupère les données de la reconnaissance de visages
 function gotFaces(results) {
-  // Save the output to the faces variable
+  // Sauvegarde les résultats dans la variable faces
   faces = results;
-  // console.log(faces);
 }
 
-// Callback function for when handPose outputs data
+// Fonction qui récupère les données de la reconnaissance de mains
 function gotHands(results) {
-  // Save the output to the hands variable
+  // Sauvegarde les résultats dans la variable hands
   hands = results;
-  // console.log(hands);
 }
 
+// Recharge tout lorsque la fenêtre change de taille
 function windowResized () {
   preload();
   setup();
