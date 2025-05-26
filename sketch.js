@@ -31,7 +31,7 @@ let earths = [];
 let rightEyes = [];
 
 let openedMouth;
-let closedMouth = [];
+let closedMouths = [];
 
 let currentFace;
 let justSwiped = false;
@@ -65,11 +65,10 @@ function preload() {
     rightEyes.push(loadImage("assets/images/rightEyes/rightEye-"+ i +".png"));
   }
   // Preload des bouches (ouvertes / fermées)
-  openedMouth = loadImage("assets/images/openedMouth/Joseph_Ducreux_Self-Portrait.jpg");
-  for (let i = 1; i <= 5; i++) {
-    rightEyes.push(loadImage("assets/images/closedmouth/closedmouth-"+ i +".png"));
+  for (let i = 1; i <= 3; i++) {
+    closedMouths.push(loadImage("assets/images/closedmouth/closedmouth-"+ i +".png"));
   }
-  closedMouth = loadImage("assets/images/openedMouth/Gian_Lorenzo_Bernini,_self-portrait.jpg");
+  openedMouth = loadImage("assets/images/openedMouth/Joseph_Ducreux_Self-Portrait.jpg");
 
 
   // // Preload Panchang Extra Bold
@@ -98,7 +97,7 @@ function setup() {
     water: waters[0],
     earth: earths[0],
     rightEye: rightEyes[round(random(0, 4))],
-    mouthclosed: mouthclosed[round(random(0, 4))]
+    closedMouth: closedMouths[round(random(0, 2))]
   }
 
   createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -336,9 +335,9 @@ function draw() {
         endClip();
 
         if (face.lips.height <= 40) {
-          image(currentFace.closedMouth, 0, 0);
+          image(currentFace.closedMouth, 0, 0, 522, 261);
         } else {
-          image(openedMouth, 0, 0);
+          image(openedMouth, 0, 0, 522, 261);
         }
       pop();
     }
