@@ -112,7 +112,7 @@ function setup() {
   angleMode(DEGREES);
 
   // Text
-  textAlign(CENTER, CENTER);
+  textAlign(CENTER, TOP);
   textFont(panchangRegular);
   textSize(16);
 }
@@ -123,6 +123,7 @@ function draw() {
   const CANVAS_WIDTH = windowWidth;
   const CANVAS_HEIGHT = windowHeight;
   const CANVAS_CENTER = createVector(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+  const mouse = createVector(mouseX, mouseY);
   
   background(245);
 
@@ -131,6 +132,7 @@ function draw() {
   } else {
     fill(8);
     text("Tracking models are loading please wait...", CANVAS_CENTER.x, CANVAS_CENTER.y);
+    text("Show both your face plus one hand to the camera to load both models.", CANVAS_CENTER.x, CANVAS_CENTER.y + 24);
   }
 
   if (modelsLoaded == true) {
@@ -147,7 +149,7 @@ function draw() {
 
         const fingerDist = round(dist(0, indexTipPos.y, 0, thumbTipPos.y));
 
-        if (fingerDist <= 15 && indexTipPos.x > fingerLastpos + 10 && !justSwiped) {
+        if (fingerDist <= 15 && indexTipPos.x > fingerLastpos + 5 && !justSwiped) {
           currentFace.faceID = currentFace.faceID == 2 ? currentFace.faceID = 0 : currentFace.faceID + 1;
           currentFace.water = waters[currentFace.faceID];
           currentFace.earth = earths[currentFace.faceID];
