@@ -41,7 +41,7 @@ let earths = [];
 
 let rightEyes = [];
 
-let openedMouth;
+let openedMouths = [];
 let closedMouths = [];
 
 let currentFace;
@@ -81,7 +81,9 @@ function preload() {
   for (let i = 1; i <= 3; i++) {
     closedMouths.push(loadImage("assets/images/closedmouth/closedmouth-"+ i +".png"));
   }
-  openedMouth = loadImage("assets/images/openedMouth/Joseph_Ducreux_Self-Portrait.jpg");
+  for (let i = 1; i <= 2; i++) {
+    openedMouths = loadImage("assets/images/openedMouth/openedmouth-"+ i +".jpg");
+  }
 
 
 
@@ -105,7 +107,8 @@ function setup() {
     water: waters[0],
     earth: earths[0],
     rightEye: rightEyes[round(random(0, 4))],
-    closedMouth: closedMouths[round(random(0, 2))]
+    closedMouth: closedMouths[round(random(0, 2))],
+    openedMouth: openedMouths[round(random(0, 1))]
   }
 
   // Capture de la vidéo
@@ -349,7 +352,7 @@ function draw() {
         if (face.lips.height <= 40) {
           image(currentFace.closedMouth, 0, 0, 522, 261);
         } else {
-          image(openedMouth, 0, 0, 522, 261);
+          image(currentFace.openedMouth, 0, 0, 522, 261);
         }
       pop();
     }
