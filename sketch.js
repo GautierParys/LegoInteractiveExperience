@@ -6,7 +6,10 @@ Il est à noter que chat GPT n'était présent lors du développement de ce proj
 lorsque mes propres recherches n'étaient pas concluentes mais aussi pour m'aider à comprendre d'où venaient certaines erreurs.
 */
 // La librairie que j'utilise pour le tracking de la tête et de la main est ml5js (https://ml5js.org/).
-
+/**
+Si il y a un problème quelcquonque lors du chargement de la page ou lors de l'exécution (comme du lag ...), c'est sûrement du aux modèles de détection de visages et de mains qui sont assez lours.
+Pour régler ce problème, il suffit de relancer la page. Si le problème persiste, alors je recommande un ctrl + F5 sur windows ou un option + cmd + R sur mac (sur safari) ou shift + cmd + r (sur chrome et firefox)
+*/
 
 "use strict";
 
