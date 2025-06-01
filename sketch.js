@@ -1,16 +1,21 @@
 // Ce code présente mon projet d'IA Lego.
 /**
-Pour le réaliser, j'ai à la fois fait de simples recherches sur internet, fait des recherches sur des sites tel que
-stack overflow ou encore utiliser chat GPT. 
-Il est à noter que chat GPT n'était présent lors du développement de ce projet que pour m'expliquer certaines notions de p5js
-lorsque mes propres recherches n'étaient pas concluentes mais aussi pour m'aider à comprendre d'où venaient certaines erreurs.
+Pour le réaliser, j'ai à la fois fait de simples recherches sur Internet, consulté des sites tels que
+Stack Overflow ou encore utilisé ChatGPT. 
+Il est à noter que ChatGPT n'était présent lors du développement de ce projet que pour m'expliquer certaines notions de p5.js
+lorsque mes propres recherches n'étaient pas concluantes, mais aussi pour m'aider à comprendre d'où venaient certaines erreurs.
 */
-// La librairie que j'utilise pour le tracking de la tête et de la main est ml5js (https://ml5js.org/).
+// La librairie que j'utilise pour le tracking de la tête et de la main est ml5.js (https://ml5js.org/).
 /**
-Si il y a un problème quelcquonque lors du chargement de la page ou lors de l'exécution (comme du lag ...), c'est sûrement du aux modèles de détection de visages et de mains qui sont assez lours.
-Pour régler ce problème, il suffit de relancer la page. Si le problème persiste, alors je recommande un ctrl + F5 sur windows ou un option + cmd + R sur mac (sur safari) ou shift + cmd + r (sur chrome et firefox)
+S’il y a un problème quelconque lors du chargement de la page ou lors de l'exécution (comme du lag...), c'est sûrement dû aux modèles de détection de visages et de mains qui sont assez lourds.
+Pour régler ce problème, il suffit de relancer la page. Si le problème persiste, alors je recommande un Ctrl + F5 sur Windows ou un Option + Cmd + R sur Mac (sur Safari) ou Shift + Cmd + R (sur Chrome et Firefox).
 */
-// Lien du github si besoin: https://github.com/GautierParys/LegoInteractiveExperience
+// Lien du GitHub si besoin : https://github.com/GautierParys/LegoInteractiveExperience
+
+/**
+Pour que tout fonctionne correctement, il faut se trouver à une cinquantaine de centimètres de la webcam, et de préférence face à elle.
+Afin de switcher entre les différents visages, il faut montrer sa main à la caméra, pincer son pouce avec son index puis glisser sa main vers la droite (et attendre un peu, c'est un peu lent).
+*/
 
 "use strict";
 
