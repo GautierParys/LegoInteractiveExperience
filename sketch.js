@@ -10,6 +10,7 @@ lorsque mes propres recherches n'étaient pas concluentes mais aussi pour m'aide
 Si il y a un problème quelcquonque lors du chargement de la page ou lors de l'exécution (comme du lag ...), c'est sûrement du aux modèles de détection de visages et de mains qui sont assez lours.
 Pour régler ce problème, il suffit de relancer la page. Si le problème persiste, alors je recommande un ctrl + F5 sur windows ou un option + cmd + R sur mac (sur safari) ou shift + cmd + r (sur chrome et firefox)
 */
+// Lien du github si besoin: https://github.com/GautierParys/LegoInteractiveExperience
 
 "use strict";
 
