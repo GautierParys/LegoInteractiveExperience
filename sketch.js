@@ -86,7 +86,7 @@ function preload() {
     closedMouths.push(loadImage("assets/images/closedmouth/closedmouth-"+ i +".png"));
   }
   for (let i = 1; i <= 2; i++) {
-    openedMouths = loadImage("assets/images/openedMouth/openedmouth-"+ i +".jpg");
+    openedMouths.push(loadImage("assets/images/openedMouth/openedmouth-"+ i +".jpg"));
   }
 
 
