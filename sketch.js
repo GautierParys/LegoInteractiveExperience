@@ -97,7 +97,7 @@ function preload() {
 
 
   // Preload Panchang Regular
-  panchangRegular = loadFont("assets/fonts/Panchang-Regular.woff",
+panchangRegular = loadFont("assets/fonts/Panchang-Regular.woff",
     () => console.log("Panchang regular loaded"),
     () => console.error("Panchang regular not loaded")
   );
